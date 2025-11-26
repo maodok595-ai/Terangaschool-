@@ -82,7 +82,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedUser = await storage.upsertUser({
         id: userId,
         role: "teacher",
-        teacherStatus: "pending",
+        teacherStatus: "approved",
         specialization,
         bio,
       });

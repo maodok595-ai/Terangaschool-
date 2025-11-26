@@ -27,13 +27,8 @@ import {
   Users, 
   BookOpen, 
   Video, 
-  TrendingUp,
-  Check,
-  X,
   Eye,
   UserCheck,
-  UserX,
-  Clock,
   FileText,
   Play,
   Square,
@@ -70,10 +65,6 @@ export default function AdminDashboard() {
     enabled: !!user && user.role === "admin",
   });
 
-  const { data: pendingTeachers, isLoading: pendingLoading } = useQuery<User[]>({
-    queryKey: ["/api/admin/pending-teachers"],
-    enabled: !!user && user.role === "admin",
-  });
 
   const { data: allUsers, isLoading: usersLoading } = useQuery<User[]>({
     queryKey: ["/api/admin/users"],
@@ -90,43 +81,6 @@ export default function AdminDashboard() {
     enabled: !!user && user.role === "admin",
   });
 
-  const approveTeacherMutation = useMutation({
-    mutationFn: async (teacherId: string) => {
-      return await apiRequest("POST", `/api/admin/teachers/${teacherId}/approve`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-teachers"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/admin"] });
-      toast({ title: "Enseignant approuvé avec succès !" });
-    },
-    onError: (error) => {
-      toast({ 
-        title: "Erreur", 
-        description: error.message,
-        variant: "destructive" 
-      });
-    },
-  });
-
-  const rejectTeacherMutation = useMutation({
-    mutationFn: async (teacherId: string) => {
-      return await apiRequest("POST", `/api/admin/teachers/${teacherId}/reject`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-teachers"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/admin"] });
-      toast({ title: "Enseignant refusé." });
-    },
-    onError: (error) => {
-      toast({ 
-        title: "Erreur", 
-        description: error.message,
-        variant: "destructive" 
-      });
-    },
-  });
 
   const startLiveMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -181,7 +135,6 @@ export default function AdminDashboard() {
   const statCards = [
     { title: "Utilisateurs", value: stats?.totalUsers || 0, icon: Users, color: "text-teal-500", bgColor: "bg-teal-100 dark:bg-teal-900/30" },
     { title: "Enseignants", value: stats?.totalTeachers || 0, icon: UserCheck, color: "text-green-500", bgColor: "bg-green-100 dark:bg-green-900/30" },
-    { title: "En attente", value: stats?.pendingTeachers || 0, icon: Clock, color: "text-yellow-500", bgColor: "bg-yellow-100 dark:bg-yellow-900/30" },
     { title: "Cours PDF", value: stats?.totalCourses || 0, icon: BookOpen, color: "text-purple-500", bgColor: "bg-purple-100 dark:bg-purple-900/30" },
     { title: "Lives", value: stats?.totalLives || 0, icon: Video, color: "text-red-500", bgColor: "bg-red-100 dark:bg-red-900/30" },
   ];
@@ -200,7 +153,7 @@ export default function AdminDashboard() {
           </div>
 
           {statsLoading ? (
-            <StatsGridSkeleton count={5} />
+            <StatsGridSkeleton count={4} />
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               {statCards.map((stat, index) => (
@@ -221,117 +174,12 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          <Tabs defaultValue="pending">
+          <Tabs defaultValue="users">
             <TabsList>
-              <TabsTrigger value="pending" className="gap-2" data-testid="tab-pending">
-                <Clock className="w-4 h-4" />
-                En attente
-                {pendingTeachers && pendingTeachers.length > 0 && (
-                  <Badge variant="destructive" className="ml-1">
-                    {pendingTeachers.length}
-                  </Badge>
-                )}
-              </TabsTrigger>
               <TabsTrigger value="users" data-testid="tab-users">Utilisateurs</TabsTrigger>
               <TabsTrigger value="courses" data-testid="tab-courses">Cours</TabsTrigger>
               <TabsTrigger value="lives" data-testid="tab-lives">Lives</TabsTrigger>
             </TabsList>
-
-            <TabsContent value="pending" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Enseignants en attente de validation</CardTitle>
-                  <CardDescription>
-                    Validez ou refusez les demandes d'inscription des enseignants
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {pendingLoading ? (
-                    <div className="space-y-4">
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <Card key={i}>
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-full bg-muted animate-pulse" />
-                              <div className="flex-1 space-y-2">
-                                <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                                <div className="h-3 w-48 bg-muted animate-pulse rounded" />
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : pendingTeachers && pendingTeachers.length > 0 ? (
-                    <div className="space-y-4">
-                      {pendingTeachers.map((teacher) => (
-                        <Card key={teacher.id} data-testid={`card-pending-teacher-${teacher.id}`}>
-                          <CardContent className="p-4">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                              <div className="flex items-center gap-4">
-                                <Avatar className="w-12 h-12">
-                                  <AvatarImage 
-                                    src={teacher.profileImageUrl || undefined} 
-                                    alt={getFullName(teacher.firstName, teacher.lastName)}
-                                    className="object-cover"
-                                  />
-                                  <AvatarFallback className="bg-primary text-primary-foreground">
-                                    {getInitials(teacher.firstName, teacher.lastName)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <p className="font-semibold">
-                                    {getFullName(teacher.firstName, teacher.lastName)}
-                                  </p>
-                                  <p className="text-sm text-muted-foreground">{teacher.email}</p>
-                                  {teacher.specialization && (
-                                    <p className="text-sm text-muted-foreground">
-                                      Spécialisation : {teacher.specialization}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                              {teacher.bio && (
-                                <p className="text-sm text-muted-foreground flex-1 md:px-4 line-clamp-2">
-                                  {teacher.bio}
-                                </p>
-                              )}
-                              <div className="flex gap-2">
-                                <Button
-                                  onClick={() => approveTeacherMutation.mutate(teacher.id)}
-                                  disabled={approveTeacherMutation.isPending}
-                                  className="gap-2"
-                                  data-testid={`button-approve-${teacher.id}`}
-                                >
-                                  <Check className="w-4 h-4" />
-                                  Approuver
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  onClick={() => rejectTeacherMutation.mutate(teacher.id)}
-                                  disabled={rejectTeacherMutation.isPending}
-                                  className="gap-2"
-                                  data-testid={`button-reject-${teacher.id}`}
-                                >
-                                  <X className="w-4 h-4" />
-                                  Refuser
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <EmptyState
-                      icon={UserCheck}
-                      title="Aucune demande en attente"
-                      description="Il n'y a pas de nouvelles demandes d'enseignant à valider."
-                    />
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
 
             <TabsContent value="users" className="mt-6">
               <Card>

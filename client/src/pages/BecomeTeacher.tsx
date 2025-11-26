@@ -30,7 +30,6 @@ import {
   Video, 
   BookOpen,
   ArrowRight,
-  Clock,
   AlertCircle
 } from "lucide-react";
 import { z } from "zod";
@@ -60,9 +59,10 @@ export default function BecomeTeacher() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({ 
-        title: "Demande envoyée !",
-        description: "Votre demande sera examinée par un administrateur."
+        title: "Félicitations !",
+        description: "Vous êtes maintenant enseignant. Accédez à votre tableau de bord."
       });
+      window.location.replace("/teacher");
     },
     onError: (error) => {
       toast({ 
@@ -140,31 +140,6 @@ export default function BecomeTeacher() {
   }
 
   if (user?.role === "teacher") {
-    if (user.teacherStatus === "pending") {
-      return (
-        <div className="min-h-screen flex flex-col bg-background">
-          <Navbar />
-          <main className="flex-1 flex items-center justify-center py-20">
-            <Card className="max-w-md mx-auto">
-              <CardContent className="py-12 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mx-auto">
-                  <Clock className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
-                </div>
-                <h2 className="text-xl font-semibold">Demande en cours de traitement</h2>
-                <p className="text-muted-foreground">
-                  Votre demande d'enseignant est en cours d'examen. Vous serez notifié une fois votre compte validé.
-                </p>
-                <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                  En attente de validation
-                </Badge>
-              </CardContent>
-            </Card>
-          </main>
-          <Footer />
-        </div>
-      );
-    }
-
     if (user.teacherStatus === "approved") {
       return (
         <div className="min-h-screen flex flex-col bg-background">
