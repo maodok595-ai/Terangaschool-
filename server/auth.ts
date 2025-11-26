@@ -17,6 +17,11 @@ declare module "express-session" {
 export async function setupAuth(app: Express) {
   const sessionSecret = process.env.SESSION_SECRET || "edurenfort-secret-key-change-in-production";
 
+  // Trust first proxy (required for Render and other platforms behind proxies)
+  if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+  }
+
   const poolConfig: any = {
     connectionString: process.env.DATABASE_URL,
   };
@@ -36,17 +41,21 @@ export async function setupAuth(app: Express) {
     createTableIfMissing: true,
   });
 
+  // Determine if we're in production
+  const isProduction = process.env.NODE_ENV === 'production';
+
   app.use(
     session({
       store: sessionStore,
       secret: sessionSecret,
       resave: false,
       saveUninitialized: false,
+      proxy: isProduction, // Trust the reverse proxy
       cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: isProduction, // Use secure cookies in production (HTTPS)
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        sameSite: "lax",
+        sameSite: "lax", // Same-site policy (frontend and backend on same domain)
       },
     })
   );

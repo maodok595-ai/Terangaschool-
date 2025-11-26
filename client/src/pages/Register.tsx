@@ -51,7 +51,7 @@ export default function Register() {
           : `Bienvenue ${user.firstName || ""}!`,
       });
       
-      // Force page reload to ensure proper redirect in production
+      // Determine target path based on role
       let targetPath = "/";
       if (user.role === "admin") {
         targetPath = "/admin";
@@ -59,10 +59,8 @@ export default function Register() {
         targetPath = "/teacher";
       }
       
-      // Use window.location for reliable redirect in production
-      setTimeout(() => {
-        window.location.href = targetPath;
-      }, 500);
+      // Use window.location.replace for reliable redirect in production
+      window.location.replace(targetPath);
     },
     onError: (error: any) => {
       toast({

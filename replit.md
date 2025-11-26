@@ -8,6 +8,12 @@ TERANGASCHOOL is a comprehensive Learning Management System (LMS) designed for F
 
 The application is built as a full-stack web application with a React-based frontend and Express backend, supporting three user roles: students, teachers, and administrators. Students can browse and access courses, teachers can create and manage educational content, and administrators oversee the platform including teacher approvals.
 
+## Admin Credentials (Persistent)
+
+- **Email:** maodok595@gmail.com
+- **Password:** Maodoka65@@
+- These credentials are hardcoded in `server/routes.ts` and created automatically on startup
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -25,7 +31,7 @@ Preferred communication style: Simple, everyday language.
 **UI Component System:**
 - Shadcn/ui component library built on Radix UI primitives
 - Tailwind CSS for styling with custom design tokens
-- Design follows Material Design principles with LMS aesthetics inspired by Coursera and Notion
+- Design follows Material Design principles with LMS aesthetics
 - Theme system supporting light/dark modes with system preference detection
 - Inter font family from Google Fonts for typography
 
@@ -34,6 +40,11 @@ Preferred communication style: Simple, everyday language.
 - Form state handled by React Hook Form with Zod validation
 - Authentication state cached in React Query with 5-minute stale time
 - Local UI state managed with React hooks (useState, useContext)
+
+**Navigation & Redirects (IMPORTANT):**
+- All post-authentication redirects use `window.location.replace()` for reliability in production
+- ProtectedPage component uses `useEffect` with `window.location.href` for redirects
+- This ensures redirects work reliably on both Replit and Render deployments
 
 ### Backend Architecture
 
@@ -44,11 +55,12 @@ Preferred communication style: Simple, everyday language.
 - Production mode serves pre-built static assets
 
 **Authentication & Session Management:**
-- Replit Auth integration using OpenID Connect (OIDC) strategy
-- Passport.js for authentication middleware
+- Custom email/password authentication with bcryptjs for password hashing
+- Role selection during login (student, teacher, admin)
 - PostgreSQL-backed session storage via connect-pg-simple
 - HTTP-only cookies for session tokens with 7-day TTL
 - Role-based access control middleware (isAuthenticated, isTeacher, isAdmin)
+- `trust proxy` enabled for production (required for Render and other proxied platforms)
 
 **File Upload System:**
 - Multer middleware for handling PDF course uploads
@@ -61,20 +73,21 @@ Preferred communication style: Simple, everyday language.
 - Role-based route protection
 - JSON request/response format
 - Error handling with appropriate HTTP status codes
+- Health check endpoint at `/api/health` for deployment monitoring
 
 ### Data Storage
 
 **Database:**
-- PostgreSQL via Neon serverless platform (@neondatabase/serverless)
+- PostgreSQL via standard `pg` driver (compatible with Render, Neon, and other providers)
 - Drizzle ORM for type-safe database operations
-- WebSocket support for serverless PostgreSQL connections
+- SSL configuration enabled automatically in production
 
 **Schema Design:**
 - Users table with role (student/teacher/admin) and teacher status (pending/approved/rejected)
 - Courses table for PDF materials with teacher relationship
 - LiveCourses table for scheduled video sessions with Jitsi integration
 - Enrollments table for student course registrations
-- Sessions table for Express session storage
+- Sessions table managed by connect-pg-simple (NOT in Drizzle schema)
 
 **Database Patterns:**
 - Drizzle schema defined in shared/schema.ts for type sharing between frontend/backend
@@ -90,14 +103,9 @@ Preferred communication style: Simple, everyday language.
 - URL format: https://meet.jit.si/{roomId}
 - Room IDs stored in database with format: edurenfort_{hex}
 
-**Authentication Provider:**
-- Replit OIDC for user authentication
-- Token refresh mechanism for session extension
-- User profile data (name, email, image) synced from OIDC provider
-
 **Database Service:**
-- Neon PostgreSQL serverless database
-- Connection pooling via @neondatabase/serverless Pool
+- Standard PostgreSQL (works with Render, Neon, or any PostgreSQL provider)
+- SSL configuration enabled in production
 - DATABASE_URL environment variable for connection string
 
 **Third-Party Libraries:**
@@ -112,3 +120,76 @@ Preferred communication style: Simple, everyday language.
 - ESBuild for production bundling
 - TypeScript compiler for type checking
 - Drizzle Kit for schema migrations
+
+## Deployment
+
+### Replit Deployment
+- Runs in development mode with hot reload
+- Uses `npm run dev` command
+- Database connection without SSL
+
+### Render Deployment
+
+**Build Process:**
+1. `scripts/build.sh` - Builds frontend with Vite and backend with esbuild
+2. `scripts/start.sh` - Syncs database and starts production server
+
+**Environment Variables (Required):**
+- `NODE_ENV=production`
+- `PORT=10000`
+- `SESSION_SECRET` (auto-generated)
+- `DATABASE_URL` (from Render PostgreSQL)
+
+**Important Render Configuration:**
+- Health check path: `/api/health`
+- Trust proxy enabled for session cookies
+- SSL enabled for database connection
+- Static files served from `dist/public`
+
+**Pre-deployment Database Setup:**
+If you get "sid is in primary key" error, run in Render Shell:
+```bash
+DROP TABLE IF EXISTS sessions CASCADE;
+npx drizzle-kit push
+```
+
+## File Structure
+
+```
+├── client/               # Frontend React application
+│   ├── src/
+│   │   ├── components/   # UI components (Navbar, ThemeToggle, etc.)
+│   │   ├── hooks/        # Custom hooks (useAuth, use-toast)
+│   │   ├── lib/          # Utilities (queryClient, constants)
+│   │   ├── pages/        # Page components (Login, Register, Dashboard, etc.)
+│   │   └── App.tsx       # Main app with routing
+│   └── index.html
+├── server/               # Backend Express application
+│   ├── app.ts            # Express app setup
+│   ├── auth.ts           # Authentication middleware and routes
+│   ├── db.ts             # Database connection
+│   ├── routes.ts         # API routes
+│   ├── storage.ts        # Data access layer
+│   ├── index-dev.ts      # Development entry point
+│   └── index-prod.ts     # Production entry point
+├── shared/
+│   └── schema.ts         # Drizzle schema and types
+├── scripts/
+│   ├── build.sh          # Production build script
+│   └── start.sh          # Production start script
+├── render.yaml           # Render deployment configuration
+├── vite.config.render.ts # Vite config for Render builds
+└── uploads/              # PDF file storage
+```
+
+## Recent Changes (November 2025)
+
+1. **Database Driver Migration:** Changed from @neondatabase/serverless to standard pg driver for compatibility with Render and other PostgreSQL providers
+
+2. **Session Management Fix:** Removed sessions table from Drizzle schema - now managed entirely by connect-pg-simple
+
+3. **Production Redirect Fix:** All navigation redirects now use `window.location.replace()` instead of wouter's `setLocation()` for reliability in production
+
+4. **Session Configuration:** Added `trust proxy` and `proxy: true` for production session handling behind reverse proxies
+
+5. **ProtectedPage Component:** Rewritten to use `useEffect` with `window.location.href` for reliable authentication checks in production
