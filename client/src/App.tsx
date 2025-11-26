@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -19,45 +19,89 @@ import TeacherDashboard from "@/pages/TeacherDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import BecomeTeacher from "@/pages/BecomeTeacher";
 
-function Router() {
-  const { isAuthenticated, isLoading, user } = useAuth();
-
-  // Show loading screen while checking authentication
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Chargement...</p>
-        </div>
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Chargement...</p>
       </div>
-    );
+    </div>
+  );
+}
+
+function ProtectedRoute({ component: Component, allowedRoles }: { component: React.ComponentType; allowedRoles?: string[] }) {
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const [, setLocation] = useLocation();
+
+  if (isLoading) {
+    return <LoadingScreen />;
   }
 
+  if (!isAuthenticated) {
+    setLocation("/login");
+    return null;
+  }
+
+  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    setLocation("/");
+    return null;
+  }
+
+  return <Component />;
+}
+
+function PublicRoute({ component: Component, redirectIfAuth = false }: { component: React.ComponentType; redirectIfAuth?: boolean }) {
+  const { isAuthenticated, isLoading } = useAuth();
+  const [, setLocation] = useLocation();
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (redirectIfAuth && isAuthenticated) {
+    setLocation("/");
+    return null;
+  }
+
+  return <Component />;
+}
+
+function HomePage() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  return isAuthenticated ? <Home /> : <Landing />;
+}
+
+function Router() {
   return (
     <Switch>
-      {/* Public routes */}
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
+      <Route path="/" component={HomePage} />
+      <Route path="/login">
+        <PublicRoute component={Login} redirectIfAuth={false} />
+      </Route>
+      <Route path="/register">
+        <PublicRoute component={Register} redirectIfAuth={false} />
+      </Route>
       <Route path="/courses" component={Courses} />
       <Route path="/courses/:id" component={CourseDetail} />
       <Route path="/lives" component={Lives} />
       <Route path="/live/:id" component={LiveDetail} />
       <Route path="/teachers" component={Teachers} />
       <Route path="/become-teacher" component={BecomeTeacher} />
-      
-      {/* Protected routes */}
-      {isAuthenticated && (
-        <>
-          <Route path="/dashboard" component={Home} />
-          <Route path="/teacher" component={TeacherDashboard} />
-          <Route path="/admin" component={AdminDashboard} />
-        </>
-      )}
-      
-      {/* Home route - different based on auth status */}
-      <Route path="/" component={isAuthenticated ? Home : Landing} />
-      
+      <Route path="/dashboard">
+        <ProtectedRoute component={Home} />
+      </Route>
+      <Route path="/teacher">
+        <ProtectedRoute component={TeacherDashboard} allowedRoles={["teacher", "admin"]} />
+      </Route>
+      <Route path="/admin">
+        <ProtectedRoute component={AdminDashboard} allowedRoles={["admin"]} />
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
