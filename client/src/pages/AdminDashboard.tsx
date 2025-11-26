@@ -132,7 +132,7 @@ export default function AdminDashboard() {
   });
 
   const deleteUserMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       return await apiRequest("DELETE", `/api/admin/users/${id}`);
     },
     onSuccess: () => {
@@ -266,17 +266,18 @@ export default function AdminDashboard() {
                       </TableBody>
                     </Table>
                   ) : allUsers && allUsers.length > 0 ? (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Utilisateur</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Rôle</TableHead>
-                          <TableHead>Statut</TableHead>
-                          <TableHead>Inscription</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
+                    <div className="overflow-x-auto">
+                      <Table className="min-w-[700px]">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Utilisateur</TableHead>
+                            <TableHead className="hidden sm:table-cell">Email</TableHead>
+                            <TableHead>Rôle</TableHead>
+                            <TableHead className="hidden md:table-cell">Statut</TableHead>
+                            <TableHead className="hidden md:table-cell">Inscription</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
                       <TableBody>
                         {allUsers.map((u) => (
                           <TableRow key={u.id} data-testid={`row-user-${u.id}`}>
@@ -291,20 +292,20 @@ export default function AdminDashboard() {
                                 <span className="font-medium">{getFullName(u.firstName, u.lastName)}</span>
                               </div>
                             </TableCell>
-                            <TableCell>{u.email}</TableCell>
+                            <TableCell className="hidden sm:table-cell">{u.email}</TableCell>
                             <TableCell>
                               <Badge className={ROLE_BADGES[u.role]?.className}>
                                 {ROLE_BADGES[u.role]?.label || u.role}
                               </Badge>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden md:table-cell">
                               {u.role === "teacher" && u.teacherStatus && (
                                 <Badge className={TEACHER_STATUS_BADGES[u.teacherStatus]?.className}>
                                   {TEACHER_STATUS_BADGES[u.teacherStatus]?.label}
                                 </Badge>
                               )}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden md:table-cell">
                               {u.createdAt && format(new Date(u.createdAt), "dd/MM/yyyy", { locale: fr })}
                             </TableCell>
                             <TableCell className="text-right">
@@ -330,7 +331,7 @@ export default function AdminDashboard() {
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Annuler</AlertDialogCancel>
                                       <AlertDialogAction
-                                        onClick={() => deleteUserMutation.mutate(Number(u.id))}
+                                        onClick={() => deleteUserMutation.mutate(u.id)}
                                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                       >
                                         Supprimer
@@ -343,7 +344,8 @@ export default function AdminDashboard() {
                           </TableRow>
                         ))}
                       </TableBody>
-                    </Table>
+                      </Table>
+                    </div>
                   ) : (
                     <EmptyState
                       icon={Users}
@@ -371,38 +373,39 @@ export default function AdminDashboard() {
                       </TableBody>
                     </Table>
                   ) : allCourses && allCourses.length > 0 ? (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Titre</TableHead>
-                          <TableHead>Enseignant</TableHead>
-                          <TableHead>Matière</TableHead>
-                          <TableHead>Niveau</TableHead>
-                          <TableHead>Vues</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {allCourses.map((course) => (
-                          <TableRow key={course.id} data-testid={`row-course-${course.id}`}>
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-muted-foreground" />
-                                {course.title}
-                              </div>
-                            </TableCell>
-                            <TableCell>{getFullName(course.teacher?.firstName, course.teacher?.lastName)}</TableCell>
-                            <TableCell>{getSubjectLabel(course.subject)}</TableCell>
-                            <TableCell>{getLevelLabel(course.level)}</TableCell>
-                            <TableCell>{course.viewCount || 0}</TableCell>
-                            <TableCell>
-                              {course.createdAt && format(new Date(course.createdAt), "dd/MM/yyyy", { locale: fr })}
-                            </TableCell>
+                    <div className="overflow-x-auto">
+                      <Table className="min-w-[700px]">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Titre</TableHead>
+                            <TableHead className="hidden sm:table-cell">Enseignant</TableHead>
+                            <TableHead>Matière</TableHead>
+                            <TableHead className="hidden md:table-cell">Niveau</TableHead>
+                            <TableHead className="hidden md:table-cell">Vues</TableHead>
+                            <TableHead className="hidden md:table-cell">Date</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {allCourses.map((course) => (
+                            <TableRow key={course.id} data-testid={`row-course-${course.id}`}>
+                              <TableCell className="font-medium">
+                                <div className="flex items-center gap-2">
+                                  <FileText className="w-4 h-4 text-muted-foreground" />
+                                  <span className="truncate max-w-[150px]">{course.title}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="hidden sm:table-cell">{getFullName(course.teacher?.firstName, course.teacher?.lastName)}</TableCell>
+                              <TableCell>{getSubjectLabel(course.subject)}</TableCell>
+                              <TableCell className="hidden md:table-cell">{getLevelLabel(course.level)}</TableCell>
+                              <TableCell className="hidden md:table-cell">{course.viewCount || 0}</TableCell>
+                              <TableCell className="hidden md:table-cell">
+                                {course.createdAt && format(new Date(course.createdAt), "dd/MM/yyyy", { locale: fr })}
+                              </TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end gap-1">
                                 <Button variant="ghost" size="icon" asChild data-testid={`button-view-course-${course.id}`}>
-                                  <a href={`/course/${course.id}`}>
+                                  <a href={`/courses/${course.id}`}>
                                     <Eye className="w-4 h-4" />
                                   </a>
                                 </Button>
@@ -439,8 +442,9 @@ export default function AdminDashboard() {
                             </TableCell>
                           </TableRow>
                         ))}
-                      </TableBody>
-                    </Table>
+                        </TableBody>
+                      </Table>
+                    </div>
                   ) : (
                     <EmptyState
                       icon={BookOpen}
