@@ -27,7 +27,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
 export function Navbar() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, logout, isLoggingOut } = useAuth();
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -120,21 +120,24 @@ export function Navbar() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <a href="/api/logout" className="flex items-center gap-2 cursor-pointer text-destructive" data-testid="menu-item-logout">
-                      <LogOut className="w-4 h-4" />
-                      Déconnexion
-                    </a>
+                  <DropdownMenuItem 
+                    onClick={() => logout()} 
+                    className="flex items-center gap-2 cursor-pointer text-destructive" 
+                    data-testid="menu-item-logout"
+                    disabled={isLoggingOut}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    {isLoggingOut ? "Déconnexion..." : "Déconnexion"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <div className="flex items-center gap-2">
                 <Button variant="ghost" asChild className="hidden sm:inline-flex" data-testid="button-login">
-                  <a href="/api/login">Connexion</a>
+                  <Link href="/login">Connexion</Link>
                 </Button>
                 <Button asChild data-testid="button-register">
-                  <a href="/api/login">S'inscrire</a>
+                  <Link href="/register">S'inscrire</Link>
                 </Button>
               </div>
             )}
@@ -167,9 +170,14 @@ export function Navbar() {
                 </Link>
               ))}
               {!isAuthenticated && (
-                <Button asChild className="mt-2">
-                  <a href="/api/login">Connexion / Inscription</a>
-                </Button>
+                <div className="flex flex-col gap-2 mt-2">
+                  <Button variant="outline" asChild>
+                    <Link href="/login">Connexion</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/register">S'inscrire</Link>
+                  </Button>
+                </div>
               )}
             </nav>
           </div>

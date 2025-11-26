@@ -92,10 +92,10 @@ export default function BecomeTeacher() {
                 Partagez vos connaissances et aidez des étudiants à réussir leurs études.
               </p>
               <Button size="lg" asChild className="text-base px-8" data-testid="button-login-to-apply">
-                <a href="/api/login">
+                <Link href="/login">
                   Se connecter pour postuler
                   <ArrowRight className="ml-2 w-5 h-5" />
-                </a>
+                </Link>
               </Button>
             </div>
           </section>

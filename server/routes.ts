@@ -2,7 +2,7 @@ import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, isTeacher, isAdmin } from "./replitAuth";
+import { setupAuth, isAuthenticated, isTeacher, isAdmin, createAdminUser } from "./auth";
 import { createCourseSchema, createLiveCourseSchema } from "@shared/schema";
 import multer from "multer";
 import path from "path";
@@ -47,20 +47,11 @@ function generateJitsiUrl(roomId: string): string {
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
-  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  await createAdminUser("maodok595@gmail.com", "Maodoka65@@");
 
   app.post("/api/become-teacher", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const { specialization, bio } = req.body;
 
       const user = await storage.getUser(userId);
@@ -131,7 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/courses", isAuthenticated, isTeacher, upload.single("pdf"), async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const { title, description, subject, level } = req.body;
 
       if (!req.file) {
@@ -164,7 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/courses/:id", isAuthenticated, isTeacher, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const id = parseInt(req.params.id);
 
       const course = await storage.getCourse(id);
@@ -222,7 +213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/live-courses", isAuthenticated, isTeacher, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const { title, description, subject, level, scheduledAt, duration } = req.body;
 
       const validation = createLiveCourseSchema.safeParse({ 
@@ -263,7 +254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/live-courses/:id/start", isAuthenticated, isTeacher, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const id = parseInt(req.params.id);
 
       const liveCourse = await storage.getLiveCourse(id);
@@ -285,7 +276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/live-courses/:id/end", isAuthenticated, isTeacher, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const id = parseInt(req.params.id);
 
       const liveCourse = await storage.getLiveCourse(id);
@@ -307,7 +298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/live-courses/:id", isAuthenticated, isTeacher, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const id = parseInt(req.params.id);
 
       const liveCourse = await storage.getLiveCourse(id);
@@ -329,7 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/stats/student", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const stats = await storage.getStudentStats(userId);
       res.json(stats);
     } catch (error) {
@@ -340,7 +331,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/stats/teacher", isAuthenticated, isTeacher, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const stats = await storage.getTeacherStats(userId);
       res.json(stats);
     } catch (error) {
@@ -361,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/teacher/courses", isAuthenticated, isTeacher, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const courses = await storage.getTeacherCourses(userId);
       res.json(courses);
     } catch (error) {
@@ -372,7 +363,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/teacher/live-courses", isAuthenticated, isTeacher, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const liveCourses = await storage.getTeacherLiveCourses(userId);
       res.json(liveCourses);
     } catch (error) {

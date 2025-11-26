@@ -70,7 +70,8 @@ export type SubjectType = (typeof Subject)[keyof typeof Subject];
 // Users table
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique(),
+  email: varchar("email").unique().notNull(),
+  password: varchar("password").default("").notNull(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
@@ -215,6 +216,23 @@ export type CourseWithTeacher = Course & { teacher: User };
 export type LiveCourseWithTeacher = LiveCourse & { teacher: User };
 
 // Validation schemas for forms
+export const loginSchema = z.object({
+  email: z.string().email("Email invalide"),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+});
+
+export const registerSchema = z.object({
+  email: z.string().email("Email invalide"),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+  confirmPassword: z.string().min(6, "Confirmez le mot de passe"),
+  firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
+  lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+  role: z.enum(["student", "teacher", "admin"]),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Les mots de passe ne correspondent pas",
+  path: ["confirmPassword"],
+});
+
 export const registerTeacherSchema = z.object({
   specialization: z.string().min(2, "La spécialisation est requise"),
   bio: z.string().min(10, "La bio doit contenir au moins 10 caractères"),

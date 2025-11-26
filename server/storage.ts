@@ -24,6 +24,7 @@ interface TeacherWithStats extends User {
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
+  createUser(user: { email: string; password: string; firstName: string; lastName: string; role: string; teacherStatus?: string }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   getUserByEmail(email: string): Promise<User | undefined>;
   updateUserRole(id: string, role: string, teacherStatus?: string): Promise<User | undefined>;
@@ -62,6 +63,21 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async createUser(userData: { email: string; password: string; firstName: string; lastName: string; role: string; teacherStatus?: string }): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values({
+        email: userData.email,
+        password: userData.password,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        role: userData.role as any,
+        teacherStatus: userData.teacherStatus as any,
+      })
+      .returning();
     return user;
   }
 
