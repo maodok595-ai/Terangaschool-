@@ -80,16 +80,19 @@ export default function TeacherDashboard() {
   const [createCourseOpen, setCreateCourseOpen] = useState(false);
   const [createLiveOpen, setCreateLiveOpen] = useState(false);
 
+  // Allow both teachers and admins to access the dashboard
+  const canAccessTeacherDashboard = user?.role === "teacher" || user?.role === "admin";
+
   useEffect(() => {
-    if (!authLoading && (!user || user.role !== "teacher")) {
+    if (!authLoading && (!user || !canAccessTeacherDashboard)) {
       toast({
         title: "Accès refusé",
-        description: "Vous devez être un enseignant approuvé pour accéder à cette page.",
+        description: "Vous devez être un enseignant ou administrateur pour accéder à cette page.",
         variant: "destructive",
       });
       navigate("/");
     }
-  }, [user, authLoading, navigate, toast]);
+  }, [user, authLoading, navigate, toast, canAccessTeacherDashboard]);
 
   const { data: stats, isLoading: statsLoading } = useQuery<{
     totalCourses: number;
@@ -98,17 +101,17 @@ export default function TeacherDashboard() {
     totalStudents: number;
   }>({
     queryKey: ["/api/stats/teacher"],
-    enabled: !!user && user.role === "teacher",
+    enabled: !!user && canAccessTeacherDashboard,
   });
 
   const { data: courses, isLoading: coursesLoading } = useQuery<Course[]>({
     queryKey: ["/api/teacher/courses"],
-    enabled: !!user && user.role === "teacher",
+    enabled: !!user && canAccessTeacherDashboard,
   });
 
   const { data: liveCourses, isLoading: livesLoading } = useQuery<LiveCourse[]>({
     queryKey: ["/api/teacher/live-courses"],
-    enabled: !!user && user.role === "teacher",
+    enabled: !!user && canAccessTeacherDashboard,
   });
 
   const courseForm = useForm({
