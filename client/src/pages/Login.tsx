@@ -41,13 +41,19 @@ export default function Login() {
         title: "Connexion réussie",
         description: `Bienvenue ${user.firstName || ""}!`,
       });
+      
+      // Force page reload to ensure proper redirect in production
+      let targetPath = "/";
       if (user.role === "admin") {
-        setLocation("/admin");
+        targetPath = "/admin";
       } else if (user.role === "teacher") {
-        setLocation("/teacher");
-      } else {
-        setLocation("/");
+        targetPath = "/teacher";
       }
+      
+      // Use window.location for reliable redirect in production
+      setTimeout(() => {
+        window.location.href = targetPath;
+      }, 500);
     },
     onError: (error: any) => {
       toast({
