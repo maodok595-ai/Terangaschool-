@@ -193,3 +193,41 @@ npx drizzle-kit push
 4. **Session Configuration:** Added `trust proxy` and `proxy: true` for production session handling behind reverse proxies
 
 5. **ProtectedPage Component:** Rewritten to use `useEffect` with `window.location.href` for reliable authentication checks in production
+
+6. **Role Selection UI:** Changed from tabs to radio buttons with emojis for role selection (Étudiant, Professeur, Administrateur)
+
+7. **Production Path Resolution:** Updated server/index-prod.ts to use multiple fallback paths for finding the public directory
+
+## Render Deployment Troubleshooting
+
+### If the app doesn't work on Render:
+
+1. **Check the logs in Render Dashboard** - Look for any error messages
+
+2. **Verify environment variables:**
+   - NODE_ENV=production
+   - PORT=10000
+   - SESSION_SECRET (should be auto-generated)
+   - DATABASE_URL (from Render PostgreSQL)
+
+3. **If sessions don't persist:**
+   - Run in Render Shell: `DROP TABLE IF EXISTS sessions CASCADE;`
+   - Then: `npx drizzle-kit push`
+   - Restart the service
+
+4. **If static files aren't served:**
+   - Check that dist/public folder exists after build
+   - Verify vite.config.render.ts is being used
+
+5. **If API calls fail:**
+   - Check that /api/health returns 200
+   - Verify DATABASE_URL is correctly set
+   - Check SSL configuration in db.ts
+
+### Manual Deployment Steps:
+```bash
+# In Render Shell
+chmod +x scripts/build.sh scripts/start.sh
+./scripts/build.sh
+./scripts/start.sh
+```
