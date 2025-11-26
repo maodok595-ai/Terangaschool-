@@ -526,6 +526,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Utilisateur non trouvé" });
       }
 
+      // Prevent deleting other admin accounts
+      if (user.role === "admin") {
+        return res.status(400).json({ message: "Impossible de supprimer un compte administrateur" });
+      }
+
       await storage.deleteUser(id);
       res.json({ message: "Utilisateur supprimé avec succès" });
     } catch (error) {

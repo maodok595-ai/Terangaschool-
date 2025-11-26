@@ -32,8 +32,21 @@ import {
   FileText,
   Play,
   Square,
-  ExternalLink
+  ExternalLink,
+  Trash2,
+  Pencil
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import type { User, Course, LiveCourse } from "@shared/schema";
@@ -108,6 +121,62 @@ export default function AdminDashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/live-courses"] });
       queryClient.invalidateQueries({ queryKey: ["/api/live-courses"] });
       toast({ title: "Live terminé !", description: "La session a été clôturée." });
+    },
+    onError: (error) => {
+      toast({ 
+        title: "Erreur", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest("DELETE", `/api/admin/users/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/admin"] });
+      toast({ title: "Utilisateur supprimé avec succès !" });
+    },
+    onError: (error) => {
+      toast({ 
+        title: "Erreur", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const deleteCourseMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest("DELETE", `/api/courses/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/admin"] });
+      toast({ title: "Cours supprimé avec succès !" });
+    },
+    onError: (error) => {
+      toast({ 
+        title: "Erreur", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const deleteLiveMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest("DELETE", `/api/live-courses/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/live-courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/live-courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/admin"] });
+      toast({ title: "Live supprimé avec succès !" });
     },
     onError: (error) => {
       toast({ 
@@ -205,6 +274,7 @@ export default function AdminDashboard() {
                           <TableHead>Rôle</TableHead>
                           <TableHead>Statut</TableHead>
                           <TableHead>Inscription</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -236,6 +306,39 @@ export default function AdminDashboard() {
                             </TableCell>
                             <TableCell>
                               {u.createdAt && format(new Date(u.createdAt), "dd/MM/yyyy", { locale: fr })}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {u.role !== "admin" && (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon"
+                                      className="text-destructive hover:text-destructive"
+                                      data-testid={`button-delete-user-${u.id}`}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Supprimer cet utilisateur ?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Cette action supprimera définitivement l'utilisateur "{getFullName(u.firstName, u.lastName)}" et toutes ses données associées.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => deleteUserMutation.mutate(Number(u.id))}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      >
+                                        Supprimer
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              )}
                             </TableCell>
                           </TableRow>
                         ))}
@@ -277,11 +380,12 @@ export default function AdminDashboard() {
                           <TableHead>Niveau</TableHead>
                           <TableHead>Vues</TableHead>
                           <TableHead>Date</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {allCourses.map((course) => (
-                          <TableRow key={course.id}>
+                          <TableRow key={course.id} data-testid={`row-course-${course.id}`}>
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
                                 <FileText className="w-4 h-4 text-muted-foreground" />
@@ -294,6 +398,44 @@ export default function AdminDashboard() {
                             <TableCell>{course.viewCount || 0}</TableCell>
                             <TableCell>
                               {course.createdAt && format(new Date(course.createdAt), "dd/MM/yyyy", { locale: fr })}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button variant="ghost" size="icon" asChild data-testid={`button-view-course-${course.id}`}>
+                                  <a href={`/course/${course.id}`}>
+                                    <Eye className="w-4 h-4" />
+                                  </a>
+                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon"
+                                      className="text-destructive hover:text-destructive"
+                                      data-testid={`button-delete-course-${course.id}`}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Supprimer ce cours ?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Cette action supprimera définitivement le cours "{course.title}" et son fichier PDF associé.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => deleteCourseMutation.mutate(course.id)}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      >
+                                        Supprimer
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -408,6 +550,35 @@ export default function AdminDashboard() {
                                       <Eye className="w-4 h-4" />
                                     </a>
                                   </Button>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button 
+                                        variant="ghost" 
+                                        size="icon"
+                                        className="text-destructive hover:text-destructive"
+                                        data-testid={`button-delete-live-${live.id}`}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Supprimer ce live ?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Cette action supprimera définitivement le live "{live.title}".
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() => deleteLiveMutation.mutate(live.id)}
+                                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                          Supprimer
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 </div>
                               </TableCell>
                             </TableRow>

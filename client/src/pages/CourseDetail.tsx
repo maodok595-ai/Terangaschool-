@@ -150,7 +150,7 @@ export default function CourseDetail() {
                     </div>
                     <div className="flex gap-2 shrink-0">
                       <Button variant="outline" size="sm" asChild data-testid="button-view-pdf">
-                        <a href={course.pdfUrl} target="_blank" rel="noopener noreferrer">
+                        <a href={course.pdfUrl ? encodeURI(course.pdfUrl) : '#'} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="w-4 h-4 sm:mr-2" />
                           <span className="hidden sm:inline">Ouvrir</span>
                         </a>
@@ -171,7 +171,7 @@ export default function CourseDetail() {
                     <div className="p-3 bg-muted/50 border-b flex items-center justify-between">
                       <span className="text-sm font-medium">Aperçu du document</span>
                       <Button variant="ghost" size="sm" asChild>
-                        <a href={course.pdfUrl} target="_blank" rel="noopener noreferrer">
+                        <a href={course.pdfUrl ? encodeURI(course.pdfUrl) : '#'} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="w-4 h-4 mr-1" />
                           Plein écran
                         </a>
@@ -179,7 +179,7 @@ export default function CourseDetail() {
                     </div>
                     <div className="aspect-[3/4] sm:aspect-[4/3] md:aspect-video">
                       <iframe
-                        src={course.pdfUrl}
+                        src={course.pdfUrl ? encodeURI(course.pdfUrl) : ''}
                         className="w-full h-full border-0"
                         title={course.title}
                       />
