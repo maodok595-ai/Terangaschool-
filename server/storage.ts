@@ -278,7 +278,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCourse(course: InsertCourse & { pdfUrl: string; pdfFileName?: string }): Promise<Course> {
-    const [newCourse] = await db.insert(courses).values(course).returning();
+    const [newCourse] = await db.insert(courses).values(course as any).returning();
     return newCourse;
   }
 
@@ -400,7 +400,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createLiveCourse(liveCourse: InsertLiveCourse & { jitsiRoomId: string; jitsiUrl: string }): Promise<LiveCourse> {
-    const [newLive] = await db.insert(liveCourses).values(liveCourse).returning();
+    const [newLive] = await db.insert(liveCourses).values(liveCourse as any).returning();
     return newLive;
   }
 
@@ -457,7 +457,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createEnrollment(enrollment: InsertEnrollment): Promise<Enrollment> {
-    const [newEnrollment] = await db.insert(enrollments).values(enrollment).returning();
+    const [newEnrollment] = await db.insert(enrollments).values(enrollment as any).returning();
     return newEnrollment;
   }
 
