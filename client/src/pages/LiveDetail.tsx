@@ -74,11 +74,12 @@ export default function LiveDetail() {
     );
   }
 
-  const scheduledDate = new Date(liveCourse.scheduledAt);
+  const scheduledDate = liveCourse.scheduledAt ? new Date(liveCourse.scheduledAt) : new Date();
+  const isValidDate = !isNaN(scheduledDate.getTime());
   const isLive = liveCourse.isActive && !liveCourse.isEnded;
-  const isUpcoming = isFuture(scheduledDate) && !liveCourse.isActive;
-  const hasEnded = liveCourse.isEnded || (isPast(scheduledDate) && !liveCourse.isActive);
-  const minutesUntilStart = differenceInMinutes(scheduledDate, new Date());
+  const isUpcoming = isValidDate && isFuture(scheduledDate) && !liveCourse.isActive;
+  const hasEnded = liveCourse.isEnded || (isValidDate && isPast(scheduledDate) && !liveCourse.isActive);
+  const minutesUntilStart = isValidDate ? differenceInMinutes(scheduledDate, new Date()) : 0;
 
   const getStatusBadge = () => {
     if (isLive) {
@@ -92,7 +93,7 @@ export default function LiveDetail() {
     if (hasEnded) {
       return <Badge variant="secondary">Terminé</Badge>;
     }
-    if (isToday(scheduledDate)) {
+    if (isValidDate && isToday(scheduledDate)) {
       return <Badge className="bg-green-500 text-white border-0">Aujourd'hui</Badge>;
     }
     return <Badge variant="outline">Programmé</Badge>;
@@ -131,11 +132,11 @@ export default function LiveDetail() {
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                <span>{format(scheduledDate, "EEEE dd MMMM yyyy", { locale: fr })}</span>
+                <span>{isValidDate ? format(scheduledDate, "EEEE dd MMMM yyyy", { locale: fr }) : "Date non définie"}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
-                <span>{format(scheduledDate, "HH:mm", { locale: fr })}</span>
+                <span>{isValidDate ? format(scheduledDate, "HH:mm", { locale: fr }) : "--:--"}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Users className="w-4 h-4" />
