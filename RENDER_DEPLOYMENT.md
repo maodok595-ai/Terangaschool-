@@ -50,7 +50,7 @@ Si vous préférez configurer manuellement :
 | **Region** | Frankfurt (EU) |
 | **Branch** | main |
 | **Runtime** | Node |
-| **Build Command** | `npm install && npm run build && npm run db:push` |
+| **Build Command** | `npm ci --include=dev && npm run build && npm run db:push` |
 | **Start Command** | `npm start` |
 | **Plan** | Free |
 
@@ -83,13 +83,15 @@ openssl rand -hex 32
 
 ### Build Command
 ```bash
-npm install && npm run build && npm run db:push
+npm ci --include=dev && npm run build && npm run db:push
 ```
 
 Cette commande :
-- Installe toutes les dépendances
+- Installe toutes les dépendances (y compris les devDependencies nécessaires pour le build)
 - Compile le frontend (Vite) et le backend (esbuild)
 - Applique le schéma de base de données
+
+**Important :** L'option `--include=dev` est nécessaire car `vite` et `esbuild` sont des devDependencies requises pour la compilation.
 
 ### Start Command
 ```bash
