@@ -8,11 +8,13 @@ TERANGASCHOOL is a comprehensive Learning Management System (LMS) designed for F
 
 The application is built as a full-stack web application with a React-based frontend and Express backend, supporting three user roles: students, teachers, and administrators. Students can browse and access courses, teachers can create and manage educational content, and administrators oversee the platform including teacher approvals.
 
-## Admin Credentials (Persistent)
+## Admin Credentials (Secured)
 
-- **Email:** maodok595@gmail.com
-- **Password:** Maodoka65@@
-- These credentials are hardcoded in `server/routes.ts` and created automatically on startup
+- Admin credentials are stored securely in environment variables:
+  - `ADMIN_EMAIL` - The admin email address
+  - `ADMIN_PASSWORD` - The admin password
+- These are read from environment variables in `server/routes.ts` and the admin user is created automatically on startup
+- For Render deployment, these must be configured in the Render dashboard environment variables
 
 ## User Preferences
 

@@ -52,13 +52,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   await setupAuth(app);
 
-  // Create admin user with error handling
-  try {
-    await createAdminUser("maodok595@gmail.com", "Maodoka65@@");
-    console.log("Admin user check completed");
-  } catch (error) {
-    console.error("Failed to create admin user:", error);
-    console.log("The admin user will be created once the database is properly synced");
+  // Create admin user with error handling using environment variables
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  
+  if (adminEmail && adminPassword) {
+    try {
+      await createAdminUser(adminEmail, adminPassword);
+      console.log("Admin user check completed");
+    } catch (error) {
+      console.error("Failed to create admin user:", error);
+      console.log("The admin user will be created once the database is properly synced");
+    }
+  } else {
+    console.log("ADMIN_EMAIL or ADMIN_PASSWORD not set - skipping admin user creation");
   }
 
   app.post("/api/become-teacher", isAuthenticated, async (req: any, res) => {
@@ -157,7 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         pdfUrl,
         pdfFileName: req.file.originalname,
         isPublished: true,
-      });
+      } as any);
 
       res.status(201).json(course);
     } catch (error) {
@@ -256,7 +263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         jitsiRoomId,
         jitsiUrl,
         maxParticipants: 100,
-      });
+      } as any);
 
       res.status(201).json(liveCourse);
     } catch (error) {
