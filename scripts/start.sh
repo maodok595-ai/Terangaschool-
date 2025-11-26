@@ -1,7 +1,13 @@
 #!/bin/bash
+set -e
 
-echo "==> Syncing database schema..."
-./node_modules/.bin/drizzle-kit push || echo "Database sync skipped or failed"
+echo "==> Environment check..."
+echo "NODE_ENV: $NODE_ENV"
+echo "PORT: $PORT"
+echo "DATABASE_URL is set: $([ -n "$DATABASE_URL" ] && echo 'YES' || echo 'NO')"
 
-echo "==> Starting application..."
-node dist/index.js
+echo "==> Checking dist folder..."
+ls -la dist/ || { echo "ERROR: dist folder not found!"; exit 1; }
+
+echo "==> Starting application on port ${PORT:-10000}..."
+NODE_ENV=production node dist/index.js
