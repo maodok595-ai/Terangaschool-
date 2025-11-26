@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { registerSchema } from "@shared/schema";
-import { GraduationCap, UserPlus, Eye, EyeOff, BookOpen, Users, AlertCircle } from "lucide-react";
+import { GraduationCap, UserPlus, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
@@ -51,13 +52,11 @@ export default function Register() {
           : `Bienvenue ${user.firstName || ""}!`,
       });
       
-      // Determine target path based on role
       let targetPath = "/";
       if (user.role === "teacher") {
         targetPath = "/teacher";
       }
       
-      // Use window.location.replace for reliable redirect in production
       window.location.replace(targetPath);
     },
     onError: (error: any) => {
@@ -73,25 +72,6 @@ export default function Register() {
     registerMutation.mutate({ ...data, role: selectedRole });
   };
 
-  const roleInfo = {
-    student: {
-      icon: Users,
-      title: "Élève",
-      description: "Accédez à tous les cours et sessions en direct",
-      color: "text-teal-600",
-      bgColor: "bg-teal-50",
-      notice: null,
-    },
-    teacher: {
-      icon: BookOpen,
-      title: "Enseignant",
-      description: "Créez et gérez vos propres cours",
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      notice: "Votre compte enseignant devra être approuvé par un administrateur avant de pouvoir créer des cours.",
-    },
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-md">
@@ -100,47 +80,54 @@ export default function Register() {
             <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
               <GraduationCap className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold">TERANGASCHOOL</span>
+            <span className="text-xl font-bold">TERANGA SCHOOL</span>
           </Link>
           <CardTitle className="text-2xl">Inscription</CardTitle>
           <CardDescription>Créez votre compte pour accéder à la plateforme</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Tabs value={selectedRole} onValueChange={(v) => setSelectedRole(v as any)} className="w-full">
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="student" className="flex items-center gap-1" data-testid="tab-student">
-                <Users className="w-4 h-4" />
-                <span className="hidden sm:inline">Élève</span>
-              </TabsTrigger>
-              <TabsTrigger value="teacher" className="flex items-center gap-1" data-testid="tab-teacher">
-                <BookOpen className="w-4 h-4" />
-                <span className="hidden sm:inline">Prof</span>
-              </TabsTrigger>
-            </TabsList>
-
-            {(["student", "teacher"] as const).map((role) => (
-              <TabsContent key={role} value={role} className="mt-4 space-y-3">
-                <div className={`p-3 rounded-lg ${roleInfo[role].bgColor}`}>
-                  <div className="flex items-center gap-2">
-                    {(() => {
-                      const Icon = roleInfo[role].icon;
-                      return <Icon className={`w-5 h-5 ${roleInfo[role].color}`} />;
-                    })()}
-                    <span className={`font-medium ${roleInfo[role].color}`}>{roleInfo[role].title}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">{roleInfo[role].description}</p>
-                </div>
-                {roleInfo[role].notice && (
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription className="text-sm">
-                      {roleInfo[role].notice}
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </TabsContent>
-            ))}
-          </Tabs>
+          <div className="space-y-3">
+            <Label className="text-base font-medium">Sélectionner votre rôle</Label>
+            <RadioGroup 
+              value={selectedRole} 
+              onValueChange={(v) => setSelectedRole(v as "student" | "teacher")}
+              className="space-y-2"
+            >
+              <div 
+                className={`flex items-center space-x-3 p-4 rounded-lg border cursor-pointer transition-colors ${
+                  selectedRole === "student" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                }`}
+                onClick={() => setSelectedRole("student")}
+              >
+                <RadioGroupItem value="student" id="student" data-testid="radio-student" />
+                <Label htmlFor="student" className="flex items-center gap-2 cursor-pointer flex-1">
+                  <span className="text-xl">👨‍🎓</span>
+                  <span className="font-medium">Étudiant</span>
+                </Label>
+              </div>
+              <div 
+                className={`flex items-center space-x-3 p-4 rounded-lg border cursor-pointer transition-colors ${
+                  selectedRole === "teacher" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                }`}
+                onClick={() => setSelectedRole("teacher")}
+              >
+                <RadioGroupItem value="teacher" id="teacher" data-testid="radio-teacher" />
+                <Label htmlFor="teacher" className="flex items-center gap-2 cursor-pointer flex-1">
+                  <span className="text-xl">👨‍🏫</span>
+                  <span className="font-medium">Professeur</span>
+                </Label>
+              </div>
+            </RadioGroup>
+            
+            {selectedRole === "teacher" && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-sm">
+                  Votre compte enseignant devra être approuvé par un administrateur avant de pouvoir créer des cours.
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
