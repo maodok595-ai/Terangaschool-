@@ -57,7 +57,7 @@ export function Navbar() {
             <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground">
               <GraduationCap className="w-5 h-5" />
             </div>
-            <span className="font-bold text-xl hidden sm:inline-block">EduRenfort</span>
+            <span className="font-bold text-xl hidden sm:inline-block">TERANGASCHOOL</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">

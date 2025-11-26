@@ -1,8 +1,10 @@
-# EduRenfort - Educational Platform
+# TERANGASCHOOL - Educational Platform
 
 ## Overview
 
-EduRenfort is a comprehensive Learning Management System (LMS) designed for French-speaking students from primary school through higher education (Primaire, Collège, Lycée, and SIEM). The platform provides access to PDF course materials and live teaching sessions via video conferencing, connecting students with qualified teachers.
+TERANGASCHOOL is a comprehensive Learning Management System (LMS) designed for French-speaking students from primary school through higher education (Primaire, Collège, Lycée, and SIEM). The platform provides access to PDF course materials and live teaching sessions via video conferencing, connecting students with qualified teachers.
+
+**Author:** Maodo Ka
 
 The application is built as a full-stack web application with a React-based frontend and Express backend, supporting three user roles: students, teachers, and administrators. Students can browse and access courses, teachers can create and manage educational content, and administrators oversee the platform including teacher approvals.
 

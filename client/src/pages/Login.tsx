@@ -94,7 +94,7 @@ export default function Login() {
             <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
               <GraduationCap className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold">EduRenfort</span>
+            <span className="text-xl font-bold">TERANGASCHOOL</span>
           </Link>
           <CardTitle className="text-2xl">Connexion</CardTitle>
           <CardDescription>Choisissez votre type de compte pour vous connecter</CardDescription>

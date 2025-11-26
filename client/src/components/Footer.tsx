@@ -11,7 +11,7 @@ export function Footer() {
               <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground">
                 <GraduationCap className="w-5 h-5" />
               </div>
-              <span className="font-bold text-xl">EduRenfort</span>
+              <span className="font-bold text-xl">TERANGASCHOOL</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               La plateforme de cours de renforcement pour tous les niveaux. Apprenez avec des enseignants qualifiés.
@@ -70,7 +70,7 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4" />
-                contact@edurenfort.com
+                contact@terangaschool.com
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Phone className="w-4 h-4" />
@@ -85,7 +85,7 @@ export function Footer() {
         </div>
 
         <div className="border-t mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} EduRenfort. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} TERANGASCHOOL. Tous droits réservés. Développé par Maodo Ka.</p>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-foreground transition-colors">
               Confidentialité
