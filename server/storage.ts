@@ -28,6 +28,8 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   getUserByEmail(email: string): Promise<User | undefined>;
   updateUserRole(id: string, role: string, teacherStatus?: string): Promise<User | undefined>;
+  updateUser(id: string, userData: Partial<{ firstName: string; lastName: string; email: string; role: string; teacherStatus: string }>): Promise<User | undefined>;
+  deleteUser(id: string): Promise<boolean>;
   getPendingTeachers(): Promise<User[]>;
   getApprovedTeachers(): Promise<TeacherWithStats[]>;
   approveTeacher(id: string): Promise<User | undefined>;
@@ -171,6 +173,27 @@ export class DatabaseStorage implements IStorage {
 
   async getAllUsers(): Promise<User[]> {
     return await db.select().from(users).orderBy(desc(users.createdAt));
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    // First delete related enrollments
+    await db.delete(enrollments).where(eq(enrollments.studentId, id));
+    // Delete courses created by this user (if teacher)
+    await db.delete(courses).where(eq(courses.teacherId, id));
+    // Delete live courses created by this user (if teacher)
+    await db.delete(liveCourses).where(eq(liveCourses.teacherId, id));
+    // Finally delete the user
+    await db.delete(users).where(eq(users.id, id));
+    return true;
+  }
+
+  async updateUser(id: string, userData: Partial<{ firstName: string; lastName: string; email: string; role: string; teacherStatus: string }>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ ...userData, updatedAt: new Date() } as any)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
   }
 
   async getCourses(filters?: { search?: string; level?: string; subject?: string; teacherId?: string }): Promise<CourseWithTeacher[]> {

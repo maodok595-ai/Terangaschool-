@@ -79,6 +79,10 @@ export default function TeacherDashboard() {
   const { toast } = useToast();
   const [createCourseOpen, setCreateCourseOpen] = useState(false);
   const [createLiveOpen, setCreateLiveOpen] = useState(false);
+  const [editCourseOpen, setEditCourseOpen] = useState(false);
+  const [editLiveOpen, setEditLiveOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [selectedLive, setSelectedLive] = useState<LiveCourse | null>(null);
 
   // Allow both teachers and admins to access the dashboard
   const canAccessTeacherDashboard = user?.role === "teacher" || user?.role === "admin";

@@ -173,6 +173,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/courses/:id", isAuthenticated, isTeacher, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const id = parseInt(req.params.id);
+      const { title, description, subject, level } = req.body;
+
+      const course = await storage.getCourse(id);
+      if (!course) {
+        return res.status(404).json({ message: "Cours non trouvé" });
+      }
+
+      // Check if user is admin or course owner
+      const user = await storage.getUser(userId);
+      if (course.teacherId !== userId && user?.role !== "admin") {
+        return res.status(403).json({ message: "Non autorisé à modifier ce cours" });
+      }
+
+      const updated = await storage.updateCourse(id, { title, description, subject, level });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating course:", error);
+      res.status(500).json({ message: "Échec de la modification du cours" });
+    }
+  });
+
   app.delete("/api/courses/:id", isAuthenticated, isTeacher, async (req: any, res) => {
     try {
       const userId = req.session.userId;
@@ -183,7 +208,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Course not found" });
       }
 
-      if (course.teacherId !== userId) {
+      // Check if user is admin or course owner
+      const user = await storage.getUser(userId);
+      if (course.teacherId !== userId && user?.role !== "admin") {
         return res.status(403).json({ message: "Not authorized to delete this course" });
       }
 
@@ -316,6 +343,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/live-courses/:id", isAuthenticated, isTeacher, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const id = parseInt(req.params.id);
+      const { title, description, subject, level, scheduledAt, duration } = req.body;
+
+      const liveCourse = await storage.getLiveCourse(id);
+      if (!liveCourse) {
+        return res.status(404).json({ message: "Session live non trouvée" });
+      }
+
+      // Check if user is admin or live course owner
+      const user = await storage.getUser(userId);
+      if (liveCourse.teacherId !== userId && user?.role !== "admin") {
+        return res.status(403).json({ message: "Non autorisé à modifier cette session" });
+      }
+
+      const updateData: any = { title, description, subject, level, duration };
+      if (scheduledAt) {
+        updateData.scheduledAt = new Date(scheduledAt);
+      }
+
+      const updated = await storage.updateLiveCourse(id, updateData);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating live course:", error);
+      res.status(500).json({ message: "Échec de la modification de la session" });
+    }
+  });
+
   app.delete("/api/live-courses/:id", isAuthenticated, isTeacher, async (req: any, res) => {
     try {
       const userId = req.session.userId;
@@ -326,7 +383,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Live course not found" });
       }
 
-      if (liveCourse.teacherId !== userId) {
+      // Check if user is admin or live course owner
+      const user = await storage.getUser(userId);
+      if (liveCourse.teacherId !== userId && user?.role !== "admin") {
         return res.status(403).json({ message: "Not authorized to delete this live" });
       }
 
@@ -427,6 +486,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error rejecting teacher:", error);
       res.status(500).json({ message: "Failed to reject teacher" });
+    }
+  });
+
+  // Admin: Update user
+  app.patch("/api/admin/users/:id", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { firstName, lastName, email, role, teacherStatus } = req.body;
+      
+      // Prevent admin from changing their own role
+      if (id === req.session.userId && role && role !== "admin") {
+        return res.status(400).json({ message: "Vous ne pouvez pas changer votre propre rôle" });
+      }
+
+      const user = await storage.updateUser(id, { firstName, lastName, email, role, teacherStatus });
+      if (!user) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Échec de la modification de l'utilisateur" });
+    }
+  });
+
+  // Admin: Delete user
+  app.delete("/api/admin/users/:id", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Prevent admin from deleting themselves
+      if (id === req.session.userId) {
+        return res.status(400).json({ message: "Vous ne pouvez pas supprimer votre propre compte" });
+      }
+
+      const user = await storage.getUser(id);
+      if (!user) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
+
+      await storage.deleteUser(id);
+      res.json({ message: "Utilisateur supprimé avec succès" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Échec de la suppression de l'utilisateur" });
     }
   });
 
