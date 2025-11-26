@@ -15,6 +15,9 @@ ls -la dist/public/ || { echo "ERROR: dist/public folder not found!"; exit 1; }
 echo "==> Creating uploads directory..."
 mkdir -p uploads
 
+echo "==> Dropping sessions table to avoid conflicts..."
+psql $DATABASE_URL -c "DROP TABLE IF EXISTS sessions CASCADE;" 2>&1 || echo "==> Could not drop sessions table, continuing..."
+
 echo "==> Syncing database schema..."
 # Use db:push which handles the sync properly
 npx drizzle-kit push 2>&1 || {
