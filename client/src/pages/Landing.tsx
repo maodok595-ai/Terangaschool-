@@ -35,9 +35,6 @@ export default function Landing() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
           
           <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-20 text-center">
-            <Badge className="mb-6 bg-white/10 text-white border-white/20 backdrop-blur-sm px-6 py-2 text-base md:text-lg">
-              Plateforme de cours de renforcement
-            </Badge>
             <div className="flex items-center justify-center gap-2 mb-6">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg">
                 <GraduationCap className="w-10 h-10 md:w-12 md:h-12 text-white" />
@@ -46,9 +43,12 @@ export default function Landing() {
                 TERANGA SCHOOL
               </h1>
             </div>
-            <p className="text-lg md:text-xl text-white/90 mb-8">
+            <p className="text-lg md:text-xl text-white/90 mb-4">
               Espace professeur et élèves
             </p>
+            <Badge className="mb-8 bg-white/10 text-white border-white/20 backdrop-blur-sm px-6 py-2 text-base md:text-lg">
+              Plateforme de cours de renforcement
+            </Badge>
             <div className="flex flex-col gap-4 items-center">
               <Button size="lg" asChild className="text-base px-12 w-48" data-testid="button-hero-register">
                 <Link href="/register">
