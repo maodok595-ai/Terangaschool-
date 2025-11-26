@@ -121,7 +121,7 @@ export async function setupAuth(app: Express) {
 
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { email, password, role } = req.body;
 
       if (!email || !password) {
         return res.status(400).json({ message: "Email et mot de passe requis" });
@@ -135,6 +135,19 @@ export async function setupAuth(app: Express) {
       const validPassword = await bcrypt.compare(password, user.password);
       if (!validPassword) {
         return res.status(401).json({ message: "Email ou mot de passe incorrect" });
+      }
+
+      // Validate that the selected role matches the user's actual role
+      if (role && role !== user.role) {
+        const roleNames: Record<string, string> = {
+          student: "étudiant",
+          teacher: "professeur",
+          admin: "administrateur"
+        };
+        const actualRoleName = roleNames[user.role] || user.role;
+        return res.status(403).json({ 
+          message: `Ce compte est un compte ${actualRoleName}. Veuillez sélectionner le bon rôle.` 
+        });
       }
 
       req.session.userId = user.id;
