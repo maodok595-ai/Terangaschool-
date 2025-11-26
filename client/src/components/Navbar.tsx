@@ -55,20 +55,22 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between gap-4">
           <div className="w-9 h-9" />
 
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
-                <Button
-                  variant={location === link.href ? "secondary" : "ghost"}
-                  className="gap-2"
-                  data-testid={`nav-link-${link.href.slice(1)}`}
-                >
-                  <link.icon className="w-4 h-4" />
-                  {link.label}
-                </Button>
-              </Link>
-            ))}
-          </nav>
+          {isAuthenticated && (
+            <nav className="hidden md:flex items-center gap-1">
+              {navLinks.map((link) => (
+                <Link key={link.href} href={link.href}>
+                  <Button
+                    variant={location === link.href ? "secondary" : "ghost"}
+                    className="gap-2"
+                    data-testid={`nav-link-${link.href.slice(1)}`}
+                  >
+                    <link.icon className="w-4 h-4" />
+                    {link.label}
+                  </Button>
+                </Link>
+              ))}
+            </nav>
+          )}
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
@@ -126,25 +128,23 @@ export function Navbar() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
-              <Button variant="ghost" asChild data-testid="button-login">
-                <Link href="/login">Connexion</Link>
+            ) : null}
+
+            {isAuthenticated && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                data-testid="button-mobile-menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </Button>
             )}
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              data-testid="button-mobile-menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
           </div>
         </div>
 
-        {mobileMenuOpen && (
+        {mobileMenuOpen && isAuthenticated && (
           <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col gap-2">
               {navLinks.map((link) => (
@@ -159,13 +159,6 @@ export function Navbar() {
                   </Button>
                 </Link>
               ))}
-              {!isAuthenticated && (
-                <div className="flex flex-col gap-2 mt-2">
-                  <Button variant="outline" asChild>
-                    <Link href="/login">Connexion</Link>
-                  </Button>
-                </div>
-              )}
             </nav>
           </div>
         )}
