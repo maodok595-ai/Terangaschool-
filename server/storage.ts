@@ -17,12 +17,18 @@ import {
 import { db } from "./db";
 import { eq, and, desc, like, or, sql, ilike, isNull, not, gte, lte } from "drizzle-orm";
 
+interface TeacherWithStats extends User {
+  courseCount?: number;
+  liveCount?: number;
+}
+
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   getUserByEmail(email: string): Promise<User | undefined>;
   updateUserRole(id: string, role: string, teacherStatus?: string): Promise<User | undefined>;
   getPendingTeachers(): Promise<User[]>;
+  getApprovedTeachers(): Promise<TeacherWithStats[]>;
   approveTeacher(id: string): Promise<User | undefined>;
   rejectTeacher(id: string): Promise<User | undefined>;
   getAllUsers(): Promise<User[]>;
@@ -97,6 +103,36 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(users)
       .where(and(eq(users.role, "teacher"), eq(users.teacherStatus, "pending")));
+  }
+
+  async getApprovedTeachers(): Promise<TeacherWithStats[]> {
+    const teachers = await db
+      .select()
+      .from(users)
+      .where(and(eq(users.role, "teacher"), eq(users.teacherStatus, "approved")))
+      .orderBy(desc(users.createdAt));
+
+    const teachersWithStats = await Promise.all(
+      teachers.map(async (teacher) => {
+        const [courseStats] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(courses)
+          .where(eq(courses.teacherId, teacher.id));
+        
+        const [liveStats] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(liveCourses)
+          .where(eq(liveCourses.teacherId, teacher.id));
+
+        return {
+          ...teacher,
+          courseCount: Number(courseStats?.count) || 0,
+          liveCount: Number(liveStats?.count) || 0,
+        };
+      })
+    );
+
+    return teachersWithStats;
   }
 
   async approveTeacher(id: string): Promise<User | undefined> {

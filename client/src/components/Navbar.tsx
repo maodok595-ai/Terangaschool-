@@ -34,6 +34,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/courses", label: "Cours", icon: BookOpen },
     { href: "/lives", label: "Lives", icon: Video },
+    { href: "/teachers", label: "Enseignants", icon: User },
   ];
 
   const getDashboardLink = () => {

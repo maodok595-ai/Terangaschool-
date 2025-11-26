@@ -12,6 +12,7 @@ import Courses from "@/pages/Courses";
 import CourseDetail from "@/pages/CourseDetail";
 import Lives from "@/pages/Lives";
 import LiveDetail from "@/pages/LiveDetail";
+import Teachers from "@/pages/Teachers";
 import TeacherDashboard from "@/pages/TeacherDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import BecomeTeacher from "@/pages/BecomeTeacher";
@@ -28,6 +29,7 @@ function Router() {
           <Route path="/courses/:id" component={CourseDetail} />
           <Route path="/lives" component={Lives} />
           <Route path="/live/:id" component={LiveDetail} />
+          <Route path="/teachers" component={Teachers} />
           <Route path="/become-teacher" component={BecomeTeacher} />
         </>
       ) : (
@@ -38,6 +40,7 @@ function Router() {
           <Route path="/courses/:id" component={CourseDetail} />
           <Route path="/lives" component={Lives} />
           <Route path="/live/:id" component={LiveDetail} />
+          <Route path="/teachers" component={Teachers} />
           <Route path="/teacher" component={TeacherDashboard} />
           <Route path="/admin" component={AdminDashboard} />
           <Route path="/become-teacher" component={BecomeTeacher} />

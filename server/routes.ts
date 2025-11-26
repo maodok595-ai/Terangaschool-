@@ -449,6 +449,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/teachers", async (req, res) => {
+    try {
+      const teachers = await storage.getApprovedTeachers();
+      res.json(teachers);
+    } catch (error) {
+      console.error("Error fetching teachers:", error);
+      res.status(500).json({ message: "Failed to fetch teachers" });
+    }
+  });
+
   app.use("/uploads", (req, res, next) => {
     res.setHeader("Content-Type", "application/pdf");
     next();
