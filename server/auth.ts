@@ -27,8 +27,11 @@ export async function setupAuth(app: Express) {
     app.set('trust proxy', 1);
   }
 
+  // Support both DATABASE_URL and RENDER_DATABASE_URL for flexibility
+  const databaseUrl = process.env.DATABASE_URL || process.env.RENDER_DATABASE_URL;
+  
   const poolConfig: any = {
-    connectionString: process.env.DATABASE_URL,
+    connectionString: databaseUrl,
   };
   
   // Add SSL configuration for production (required by Render)

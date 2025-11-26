@@ -114,23 +114,23 @@ export default function TeacherDashboard() {
     enabled: !!user && canAccessTeacherDashboard,
   });
 
-  const courseForm = useForm({
+  const courseForm = useForm<z.infer<typeof createCourseSchema>>({
     resolver: zodResolver(createCourseSchema),
     defaultValues: {
       title: "",
       description: "",
-      subject: "",
-      level: "",
+      subject: undefined as any,
+      level: undefined as any,
     },
   });
 
-  const liveForm = useForm({
+  const liveForm = useForm<z.infer<typeof createLiveCourseSchema>>({
     resolver: zodResolver(createLiveCourseSchema),
     defaultValues: {
       title: "",
       description: "",
-      subject: "",
-      level: "",
+      subject: undefined as any,
+      level: undefined as any,
       scheduledAt: "",
       duration: 60,
     },
