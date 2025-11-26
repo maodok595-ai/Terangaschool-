@@ -68,6 +68,11 @@ export async function setupAuth(app: Express) {
         return res.status(400).json({ message: "Tous les champs sont requis" });
       }
 
+      // Block admin registration - admins can only be created by other admins
+      if (role === "admin") {
+        return res.status(403).json({ message: "L'inscription en tant qu'administrateur n'est pas autorisée" });
+      }
+
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
         return res.status(400).json({ message: "Cet email est déjà utilisé" });

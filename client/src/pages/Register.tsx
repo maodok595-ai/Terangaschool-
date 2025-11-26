@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { registerSchema } from "@shared/schema";
-import { GraduationCap, UserPlus, Eye, EyeOff, Shield, BookOpen, Users, AlertCircle } from "lucide-react";
+import { GraduationCap, UserPlus, Eye, EyeOff, BookOpen, Users, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -22,7 +22,7 @@ export default function Register() {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<"student" | "teacher" | "admin">("student");
+  const [selectedRole, setSelectedRole] = useState<"student" | "teacher">("student");
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -53,9 +53,7 @@ export default function Register() {
       
       // Determine target path based on role
       let targetPath = "/";
-      if (user.role === "admin") {
-        targetPath = "/admin";
-      } else if (user.role === "teacher") {
+      if (user.role === "teacher") {
         targetPath = "/teacher";
       }
       
@@ -92,14 +90,6 @@ export default function Register() {
       bgColor: "bg-green-50",
       notice: "Votre compte enseignant devra être approuvé par un administrateur avant de pouvoir créer des cours.",
     },
-    admin: {
-      icon: Shield,
-      title: "Administrateur",
-      description: "Gérez la plateforme et les utilisateurs",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      notice: "Les comptes administrateurs sont réservés au personnel autorisé.",
-    },
   };
 
   return (
@@ -117,7 +107,7 @@ export default function Register() {
         </CardHeader>
         <CardContent className="space-y-6">
           <Tabs value={selectedRole} onValueChange={(v) => setSelectedRole(v as any)} className="w-full">
-            <TabsList className="grid grid-cols-3 w-full">
+            <TabsList className="grid grid-cols-2 w-full">
               <TabsTrigger value="student" className="flex items-center gap-1" data-testid="tab-student">
                 <Users className="w-4 h-4" />
                 <span className="hidden sm:inline">Élève</span>
@@ -126,13 +116,9 @@ export default function Register() {
                 <BookOpen className="w-4 h-4" />
                 <span className="hidden sm:inline">Prof</span>
               </TabsTrigger>
-              <TabsTrigger value="admin" className="flex items-center gap-1" data-testid="tab-admin">
-                <Shield className="w-4 h-4" />
-                <span className="hidden sm:inline">Admin</span>
-              </TabsTrigger>
             </TabsList>
 
-            {(["student", "teacher", "admin"] as const).map((role) => (
+            {(["student", "teacher"] as const).map((role) => (
               <TabsContent key={role} value={role} className="mt-4 space-y-3">
                 <div className={`p-3 rounded-lg ${roleInfo[role].bgColor}`}>
                   <div className="flex items-center gap-2">
