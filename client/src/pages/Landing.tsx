@@ -38,9 +38,14 @@ export default function Landing() {
             <Badge className="mb-6 bg-white/10 text-white border-white/20 backdrop-blur-sm px-4 py-1.5">
               Plateforme de cours de renforcement
             </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 max-w-4xl mx-auto leading-tight">
-              Réussissez vos études avec des cours de qualité
-            </h1>
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg">
+                <GraduationCap className="w-10 h-10 md:w-12 md:h-12 text-white" />
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-teal-400">
+                TERANGA SCHOOL
+              </h1>
+            </div>
             <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl mx-auto">
               Accédez à des cours PDF et des sessions en direct avec des enseignants qualifiés. 
               Du primaire au SIEM, trouvez le soutien dont vous avez besoin.
