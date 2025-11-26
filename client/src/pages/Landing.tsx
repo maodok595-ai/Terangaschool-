@@ -17,6 +17,7 @@ import {
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { EDUCATION_LEVELS } from "@/lib/constants";
+import heroBackground from "@assets/generated_images/senegalese_school_classroom_scene.png";
 
 export default function Landing() {
   return (
@@ -28,7 +29,7 @@ export default function Landing() {
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1920&q=80')`,
+              backgroundImage: `url(${heroBackground})`,
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
