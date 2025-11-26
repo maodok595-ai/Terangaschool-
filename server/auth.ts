@@ -80,9 +80,10 @@ export async function setupAuth(app: Express) {
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
+      // Teachers are automatically approved (no validation required)
       let teacherStatus: string | undefined;
       if (role === "teacher") {
-        teacherStatus = "pending";
+        teacherStatus = "approved";
       }
 
       const user = await storage.createUser({
