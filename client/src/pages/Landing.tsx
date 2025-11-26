@@ -35,10 +35,10 @@ export default function Landing() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
           
           <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-20 text-center">
-            <Badge className="mb-6 bg-white/10 text-white border-white/20 backdrop-blur-sm px-4 py-1.5">
+            <Badge className="mb-6 bg-white/10 text-white border-white/20 backdrop-blur-sm px-6 py-2 text-base md:text-lg">
               Plateforme de cours de renforcement
             </Badge>
-            <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="flex items-center justify-center gap-2 mb-6">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg">
                 <GraduationCap className="w-10 h-10 md:w-12 md:h-12 text-white" />
               </div>
@@ -53,17 +53,6 @@ export default function Landing() {
               <Button size="lg" asChild className="text-base px-12 w-48" data-testid="button-hero-register">
                 <Link href="/register">
                   S'inscrire
-                </Link>
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                asChild 
-                className="text-base px-12 w-48 bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm"
-                data-testid="button-hero-login"
-              >
-                <Link href="/login">
-                  Se connecter
                 </Link>
               </Button>
             </div>
