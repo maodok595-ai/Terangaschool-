@@ -5,6 +5,18 @@ echo "==> Environment check..."
 echo "NODE_ENV: $NODE_ENV"
 echo "PORT: $PORT"
 echo "DATABASE_URL is set: $([ -n "$DATABASE_URL" ] && echo 'YES' || echo 'NO')"
+echo "RENDER_DATABASE_URL is set: $([ -n "$RENDER_DATABASE_URL" ] && echo 'YES' || echo 'NO')"
+
+# Support both DATABASE_URL and RENDER_DATABASE_URL
+if [ -z "$DATABASE_URL" ] && [ -n "$RENDER_DATABASE_URL" ]; then
+    echo "==> Using RENDER_DATABASE_URL as DATABASE_URL..."
+    export DATABASE_URL="$RENDER_DATABASE_URL"
+fi
+
+if [ -z "$DATABASE_URL" ]; then
+    echo "ERROR: No database URL configured!"
+    exit 1
+fi
 
 echo "==> Checking dist folder..."
 ls -la dist/ || { echo "ERROR: dist folder not found!"; exit 1; }
