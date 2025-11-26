@@ -35,15 +35,15 @@ export default function Landing() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
           
           <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-20 text-center">
-            <Badge className="mb-6 bg-white/10 text-white border-white/20 backdrop-blur-sm px-4 py-1.5">
+            <Badge className="mb-8 bg-white/20 text-white border-white/30 backdrop-blur-sm px-6 py-2 text-base">
               Plateforme de cours de renforcement
             </Badge>
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg">
-                <GraduationCap className="w-10 h-10 md:w-12 md:h-12 text-white" />
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 mb-8">
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-teal-500 flex items-center justify-center shadow-xl">
+                <GraduationCap className="w-12 h-12 md:w-14 md:h-14 text-white" />
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-teal-400">
-                TERANGA SCHOOL
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-teal-400 tracking-wide">
+                TERANGA<br className="md:hidden" /> SCHOOL
               </h1>
             </div>
             <p className="text-lg md:text-xl text-white/90 mb-8">
