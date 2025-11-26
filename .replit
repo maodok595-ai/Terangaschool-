@@ -56,3 +56,8 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_log_in_with_replit:1.0.0", "javascript_database:1.0.0"]
+
+[userenv]
+
+[userenv.production]
+RENDER_DATABASE_URL = "postgresql://schooler_e6s3_user:20bLVQQCHojWh22SMTwsuq7SsB5ZTID2@dpg-d4jil424d50c73cms6fg-a.oregon-postgres.render.com/schooler_e6s3"
