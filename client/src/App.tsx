@@ -20,38 +20,44 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import BecomeTeacher from "@/pages/BecomeTeacher";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
+      {/* Public routes */}
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/courses" component={Courses} />
+      <Route path="/courses/:id" component={CourseDetail} />
+      <Route path="/lives" component={Lives} />
+      <Route path="/live/:id" component={LiveDetail} />
+      <Route path="/teachers" component={Teachers} />
+      <Route path="/become-teacher" component={BecomeTeacher} />
+      
+      {/* Protected routes */}
+      {isAuthenticated && (
         <>
-          <Route path="/" component={Landing} />
-          <Route path="/login" component={Login} />
-          <Route path="/register" component={Register} />
-          <Route path="/courses" component={Courses} />
-          <Route path="/courses/:id" component={CourseDetail} />
-          <Route path="/lives" component={Lives} />
-          <Route path="/live/:id" component={LiveDetail} />
-          <Route path="/teachers" component={Teachers} />
-          <Route path="/become-teacher" component={BecomeTeacher} />
-        </>
-      ) : (
-        <>
-          <Route path="/" component={Home} />
           <Route path="/dashboard" component={Home} />
-          <Route path="/login" component={Login} />
-          <Route path="/register" component={Register} />
-          <Route path="/courses" component={Courses} />
-          <Route path="/courses/:id" component={CourseDetail} />
-          <Route path="/lives" component={Lives} />
-          <Route path="/live/:id" component={LiveDetail} />
-          <Route path="/teachers" component={Teachers} />
           <Route path="/teacher" component={TeacherDashboard} />
           <Route path="/admin" component={AdminDashboard} />
-          <Route path="/become-teacher" component={BecomeTeacher} />
         </>
       )}
+      
+      {/* Home route - different based on auth status */}
+      <Route path="/" component={isAuthenticated ? Home : Landing} />
+      
       <Route component={NotFound} />
     </Switch>
   );
