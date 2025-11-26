@@ -13,13 +13,8 @@ echo "==> Building backend with esbuild..."
 echo "==> Creating uploads directory..."
 mkdir -p uploads
 
-echo "==> Pushing database schema (if DATABASE_URL is available)..."
-if [ -n "$DATABASE_URL" ]; then
-  ./node_modules/.bin/drizzle-kit push || echo "Warning: Database push failed, will retry on startup"
-else
-  echo "DATABASE_URL not set, skipping database push (run manually after deploy)"
-fi
-
 echo "==> Build complete!"
 echo "==> Contents of dist folder:"
 ls -la dist/
+echo ""
+echo "NOTE: Run 'npx drizzle-kit push' manually after first deploy to sync database schema"
