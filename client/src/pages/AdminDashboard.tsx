@@ -34,7 +34,10 @@ import {
   UserCheck,
   UserX,
   Clock,
-  FileText
+  FileText,
+  Play,
+  Square,
+  ExternalLink
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -115,6 +118,42 @@ export default function AdminDashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/admin"] });
       toast({ title: "Enseignant refusé." });
+    },
+    onError: (error) => {
+      toast({ 
+        title: "Erreur", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const startLiveMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest("POST", `/api/live-courses/${id}/start`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/live-courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/live-courses"] });
+      toast({ title: "Live démarré !", description: "Les participants peuvent maintenant rejoindre." });
+    },
+    onError: (error) => {
+      toast({ 
+        title: "Erreur", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const endLiveMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest("POST", `/api/live-courses/${id}/end`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/live-courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/live-courses"] });
+      toast({ title: "Live terminé !", description: "La session a été clôturée." });
     },
     onError: (error) => {
       toast({ 
@@ -439,45 +478,95 @@ export default function AdminDashboard() {
                       </TableBody>
                     </Table>
                   ) : allLives && allLives.length > 0 ? (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Titre</TableHead>
-                          <TableHead>Enseignant</TableHead>
-                          <TableHead>Matière</TableHead>
-                          <TableHead>Niveau</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Statut</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {allLives.map((live) => (
-                          <TableRow key={live.id}>
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <Video className="w-4 h-4 text-muted-foreground" />
-                                {live.title}
-                              </div>
-                            </TableCell>
-                            <TableCell>{getFullName(live.teacher?.firstName, live.teacher?.lastName)}</TableCell>
-                            <TableCell>{getSubjectLabel(live.subject)}</TableCell>
-                            <TableCell>{getLevelLabel(live.level)}</TableCell>
-                            <TableCell>
-                              {format(new Date(live.scheduledAt), "dd/MM/yyyy HH:mm", { locale: fr })}
-                            </TableCell>
-                            <TableCell>
-                              {live.isActive ? (
-                                <Badge className="bg-red-500 text-white border-0">En direct</Badge>
-                              ) : live.isEnded ? (
-                                <Badge variant="secondary">Terminé</Badge>
-                              ) : (
-                                <Badge variant="outline">Programmé</Badge>
-                              )}
-                            </TableCell>
+                    <div className="overflow-x-auto">
+                      <Table className="min-w-[800px]">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Titre</TableHead>
+                            <TableHead>Enseignant</TableHead>
+                            <TableHead>Matière</TableHead>
+                            <TableHead>Niveau</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Statut</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {allLives.map((live) => (
+                            <TableRow key={live.id}>
+                              <TableCell className="font-medium">
+                                <div className="flex items-center gap-2">
+                                  <Video className="w-4 h-4 text-muted-foreground" />
+                                  <span className="truncate max-w-[150px]">{live.title}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>{getFullName(live.teacher?.firstName, live.teacher?.lastName)}</TableCell>
+                              <TableCell>{getSubjectLabel(live.subject)}</TableCell>
+                              <TableCell>{getLevelLabel(live.level)}</TableCell>
+                              <TableCell>
+                                {format(new Date(live.scheduledAt), "dd/MM/yyyy HH:mm", { locale: fr })}
+                              </TableCell>
+                              <TableCell>
+                                {live.isActive ? (
+                                  <Badge className="bg-red-500 text-white border-0">En direct</Badge>
+                                ) : live.isEnded ? (
+                                  <Badge variant="secondary">Terminé</Badge>
+                                ) : (
+                                  <Badge variant="outline">Programmé</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-1">
+                                  {!live.isEnded && !live.isActive && (
+                                    <Button 
+                                      variant="default"
+                                      size="sm"
+                                      onClick={() => startLiveMutation.mutate(live.id)}
+                                      disabled={startLiveMutation.isPending}
+                                      className="bg-green-600 hover:bg-green-700"
+                                      data-testid={`button-start-live-${live.id}`}
+                                    >
+                                      <Play className="w-4 h-4 mr-1" />
+                                      Démarrer
+                                    </Button>
+                                  )}
+                                  {live.isActive && !live.isEnded && (
+                                    <>
+                                      <Button 
+                                        variant="outline"
+                                        size="sm"
+                                        asChild
+                                        data-testid={`button-join-live-${live.id}`}
+                                      >
+                                        <a href={live.jitsiUrl} target="_blank" rel="noopener noreferrer">
+                                          <ExternalLink className="w-4 h-4 mr-1" />
+                                          Rejoindre
+                                        </a>
+                                      </Button>
+                                      <Button 
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => endLiveMutation.mutate(live.id)}
+                                        disabled={endLiveMutation.isPending}
+                                        data-testid={`button-end-live-${live.id}`}
+                                      >
+                                        <Square className="w-4 h-4 mr-1" />
+                                        Terminer
+                                      </Button>
+                                    </>
+                                  )}
+                                  <Button variant="ghost" size="icon" asChild data-testid={`button-view-live-${live.id}`}>
+                                    <a href={`/live/${live.id}`}>
+                                      <Eye className="w-4 h-4" />
+                                    </a>
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   ) : (
                     <EmptyState
                       icon={Video}
