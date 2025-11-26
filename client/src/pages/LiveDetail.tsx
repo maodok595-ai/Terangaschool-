@@ -29,6 +29,11 @@ export default function LiveDetail() {
 
   const { data: liveCourse, isLoading, error } = useQuery<LiveCourseWithTeacher>({
     queryKey: ["/api/live-courses", id],
+    queryFn: async () => {
+      const res = await fetch(`/api/live-courses/${id}`, { credentials: "include" });
+      if (!res.ok) throw new Error("Live non trouvé");
+      return res.json();
+    },
     enabled: !!id,
   });
 

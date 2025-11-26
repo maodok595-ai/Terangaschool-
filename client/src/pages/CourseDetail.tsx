@@ -28,6 +28,11 @@ export default function CourseDetail() {
 
   const { data: course, isLoading, error } = useQuery<CourseWithTeacher>({
     queryKey: ["/api/courses", id],
+    queryFn: async () => {
+      const res = await fetch(`/api/courses/${id}`, { credentials: "include" });
+      if (!res.ok) throw new Error("Cours non trouvé");
+      return res.json();
+    },
     enabled: !!id,
   });
 
