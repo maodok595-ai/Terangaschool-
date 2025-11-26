@@ -202,6 +202,30 @@ npx drizzle-kit push
 
 8. **Teacher Validation Removed:** Teachers are now automatically approved upon registration - no admin validation required
 
+9. **Database URL Fallback:** Both db.ts and auth.ts now support RENDER_DATABASE_URL as fallback if DATABASE_URL is not set
+
+10. **Session Security:** SESSION_SECRET is now logged as a warning if not set in production (strongly recommended to set it)
+
+11. **Admin Dashboard Access:** Admins can now access the teacher dashboard and create courses/lives (isTeacher middleware allows admin role)
+
+12. **Scripts Cleanup:** Removed automatic session table drop from start.sh to preserve user sessions between deployments
+
+## Known Limitations
+
+### Ephemeral File Storage on Render
+**Important:** Render uses ephemeral filesystem by default. This means uploaded PDF files in the `/uploads` directory will be lost on each redeploy or restart.
+
+**Solutions:**
+1. **Render Disk (Recommended):** Attach a Render Disk volume mounted at `./uploads` for persistent storage
+2. **External Storage:** Migrate to S3, Cloudinary, or another object storage service and store public URLs
+3. **Database Storage:** For smaller files, consider storing files as base64 in the database (not recommended for large PDFs)
+
+To attach a Render Disk:
+1. Go to your Render Dashboard
+2. Select your web service
+3. Go to "Disks" tab
+4. Add a new disk mounted at `/uploads`
+
 ## Render Deployment Troubleshooting
 
 ### If the app doesn't work on Render:

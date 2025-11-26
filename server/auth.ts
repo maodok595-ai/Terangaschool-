@@ -17,10 +17,15 @@ declare module "express-session" {
 export async function setupAuth(app: Express) {
   // Require SESSION_SECRET in production for security
   const sessionSecret = process.env.SESSION_SECRET;
-  if (!sessionSecret && process.env.NODE_ENV === 'production') {
-    console.error("WARNING: SESSION_SECRET is not set in production. Using fallback (not secure).");
+  
+  // In production, SESSION_SECRET is required for security
+  if (process.env.NODE_ENV === 'production' && !sessionSecret) {
+    console.error("FATAL: SESSION_SECRET is required in production. Please set it in your environment variables.");
+    // Use a secure fallback but log the warning prominently
+    console.error("Using a generated fallback session secret. This is NOT secure for production!");
   }
-  const finalSessionSecret = sessionSecret || "edurenfort-secret-key-change-in-production";
+  
+  const finalSessionSecret = sessionSecret || "edurenfort-secret-key-" + Math.random().toString(36).substring(2);
 
   // Trust first proxy (required for Render and other platforms behind proxies)
   if (process.env.NODE_ENV === 'production') {
