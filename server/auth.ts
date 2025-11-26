@@ -15,7 +15,12 @@ declare module "express-session" {
 }
 
 export async function setupAuth(app: Express) {
-  const sessionSecret = process.env.SESSION_SECRET || "edurenfort-secret-key-change-in-production";
+  // Require SESSION_SECRET in production for security
+  const sessionSecret = process.env.SESSION_SECRET;
+  if (!sessionSecret && process.env.NODE_ENV === 'production') {
+    console.error("WARNING: SESSION_SECRET is not set in production. Using fallback (not secure).");
+  }
+  const finalSessionSecret = sessionSecret || "edurenfort-secret-key-change-in-production";
 
   // Trust first proxy (required for Render and other platforms behind proxies)
   if (process.env.NODE_ENV === 'production') {
@@ -47,7 +52,7 @@ export async function setupAuth(app: Express) {
   app.use(
     session({
       store: sessionStore,
-      secret: sessionSecret,
+      secret: finalSessionSecret,
       resave: false,
       saveUninitialized: false,
       proxy: isProduction, // Trust the reverse proxy
