@@ -1,7 +1,5 @@
 import { sql, relations } from "drizzle-orm";
 import {
-  index,
-  jsonb,
   pgTable,
   timestamp,
   varchar,
@@ -12,16 +10,8 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for Replit Auth
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
+// Note: The sessions table is managed by connect-pg-simple, not Drizzle
+// It will be created automatically when the app starts
 
 // User roles enum
 export const UserRole = {
