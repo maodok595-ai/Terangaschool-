@@ -88,12 +88,14 @@ chmod +x scripts/build.sh && ./scripts/build.sh
 
 Le script `scripts/build.sh` :
 1. Installe toutes les dépendances (y compris les devDependencies)
-2. Compile le frontend avec Vite (vers `dist/public/`)
+2. Compile le frontend avec Vite en utilisant `vite.config.render.ts` (sans plugins Replit)
 3. Compile le backend avec esbuild (vers `dist/index.js`)
 4. Crée le dossier uploads
 5. Applique le schéma de base de données
 
-**Note :** Le script utilise les chemins directs vers les binaires (`./node_modules/.bin/vite`) pour éviter les problèmes de PATH.
+**Notes importantes :**
+- Le script utilise les chemins directs vers les binaires (`./node_modules/.bin/vite`)
+- Une configuration Vite séparée (`vite.config.render.ts`) est utilisée pour éviter les plugins Replit-spécifiques
 
 ### Start Command
 ```bash
