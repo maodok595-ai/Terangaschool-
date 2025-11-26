@@ -11,8 +11,8 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    buildCommand: chmod +x scripts/build.sh && ./scripts/build.sh
-    startCommand: npm start
+    buildCommand: chmod +x scripts/build.sh && chmod +x scripts/start.sh && ./scripts/build.sh
+    startCommand: ./scripts/start.sh
     envVars:
       - key: NODE_ENV
         value: production
