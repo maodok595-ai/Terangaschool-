@@ -295,7 +295,7 @@ export default function TeacherDashboard() {
   }
 
   const statCards = [
-    { title: "Mes cours", value: stats?.totalCourses || 0, icon: BookOpen, color: "text-blue-500", bgColor: "bg-blue-100 dark:bg-blue-900/30" },
+    { title: "Mes cours", value: stats?.totalCourses || 0, icon: BookOpen, color: "text-teal-500", bgColor: "bg-teal-100 dark:bg-teal-900/30" },
     { title: "Lives programmés", value: stats?.totalLives || 0, icon: Video, color: "text-red-500", bgColor: "bg-red-100 dark:bg-red-900/30" },
     { title: "Vues totales", value: stats?.totalViews || 0, icon: Eye, color: "text-green-500", bgColor: "bg-green-100 dark:bg-green-900/30" },
     { title: "Étudiants actifs", value: stats?.totalStudents || 0, icon: Users, color: "text-purple-500", bgColor: "bg-purple-100 dark:bg-purple-900/30" },

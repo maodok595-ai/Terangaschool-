@@ -71,8 +71,8 @@ export default function Login() {
       icon: Users,
       title: "Élève",
       description: "Accédez à tous les cours et sessions en direct",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      color: "text-teal-600",
+      bgColor: "bg-teal-50",
     },
     teacher: {
       icon: BookOpen,

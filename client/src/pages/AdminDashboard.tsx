@@ -179,7 +179,7 @@ export default function AdminDashboard() {
   }
 
   const statCards = [
-    { title: "Utilisateurs", value: stats?.totalUsers || 0, icon: Users, color: "text-blue-500", bgColor: "bg-blue-100 dark:bg-blue-900/30" },
+    { title: "Utilisateurs", value: stats?.totalUsers || 0, icon: Users, color: "text-teal-500", bgColor: "bg-teal-100 dark:bg-teal-900/30" },
     { title: "Enseignants", value: stats?.totalTeachers || 0, icon: UserCheck, color: "text-green-500", bgColor: "bg-green-100 dark:bg-green-900/30" },
     { title: "En attente", value: stats?.pendingTeachers || 0, icon: Clock, color: "text-yellow-500", bgColor: "bg-yellow-100 dark:bg-yellow-900/30" },
     { title: "Cours PDF", value: stats?.totalCourses || 0, icon: BookOpen, color: "text-purple-500", bgColor: "bg-purple-100 dark:bg-purple-900/30" },

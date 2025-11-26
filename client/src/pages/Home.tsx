@@ -46,8 +46,8 @@ export default function Home() {
       title: "Cours disponibles",
       value: stats?.totalCourses || 0,
       icon: BookOpen,
-      color: "text-blue-500",
-      bgColor: "bg-blue-100 dark:bg-blue-900/30",
+      color: "text-teal-500",
+      bgColor: "bg-teal-100 dark:bg-teal-900/30",
     },
     {
       title: "Lives à venir",

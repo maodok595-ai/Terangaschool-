@@ -80,8 +80,8 @@ export default function Register() {
       icon: Users,
       title: "Élève",
       description: "Accédez à tous les cours et sessions en direct",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      color: "text-teal-600",
+      bgColor: "bg-teal-50",
       notice: null,
     },
     teacher: {

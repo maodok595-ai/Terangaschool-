@@ -22,13 +22,13 @@ export const SUBJECTS = [
 
 export const LEVEL_COLORS: Record<string, string> = {
   primaire: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  college: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+  college: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400",
   lycee: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
   siem: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
 };
 
 export const SUBJECT_COLORS: Record<string, string> = {
-  mathematiques: "border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-400",
+  mathematiques: "border-teal-300 text-teal-700 dark:border-teal-700 dark:text-teal-400",
   francais: "border-red-300 text-red-700 dark:border-red-700 dark:text-red-400",
   anglais: "border-emerald-300 text-emerald-700 dark:border-emerald-700 dark:text-emerald-400",
   physique: "border-cyan-300 text-cyan-700 dark:border-cyan-700 dark:text-cyan-400",
@@ -42,7 +42,7 @@ export const SUBJECT_COLORS: Record<string, string> = {
 
 export const ROLE_BADGES: Record<string, { label: string; className: string }> = {
   admin: { label: "Admin", className: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400" },
-  teacher: { label: "Enseignant", className: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" },
+  teacher: { label: "Enseignant", className: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400" },
   student: { label: "Étudiant", className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" },
 };
 
