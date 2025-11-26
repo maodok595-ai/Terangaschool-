@@ -46,26 +46,24 @@ export default function Landing() {
                 TERANGA SCHOOL
               </h1>
             </div>
-            <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-              Accédez à des cours PDF et des sessions en direct avec des enseignants qualifiés. 
-              Du primaire au SIEM, trouvez le soutien dont vous avez besoin.
+            <p className="text-lg md:text-xl text-white/90 mb-8">
+              Espace professeur et élèves
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild className="text-base px-8" data-testid="button-hero-register">
+            <div className="flex flex-col gap-4 items-center">
+              <Button size="lg" asChild className="text-base px-12 w-48" data-testid="button-hero-register">
                 <Link href="/register">
-                  Commencer maintenant
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                  S'inscrire
                 </Link>
               </Button>
               <Button 
                 size="lg" 
                 variant="outline" 
                 asChild 
-                className="text-base px-8 bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm"
-                data-testid="button-hero-courses"
+                className="text-base px-12 w-48 bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm"
+                data-testid="button-hero-login"
               >
-                <Link href="/courses">
-                  Découvrir les cours
+                <Link href="/login">
+                  Se connecter
                 </Link>
               </Button>
             </div>
