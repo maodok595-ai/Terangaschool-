@@ -50,7 +50,7 @@ Si vous préférez configurer manuellement :
 | **Region** | Frankfurt (EU) |
 | **Branch** | main |
 | **Runtime** | Node |
-| **Build Command** | `npm ci --include=dev && npm run build && npm run db:push` |
+| **Build Command** | `chmod +x scripts/build.sh && ./scripts/build.sh` |
 | **Start Command** | `npm start` |
 | **Plan** | Free |
 
@@ -83,15 +83,17 @@ openssl rand -hex 32
 
 ### Build Command
 ```bash
-npm ci --include=dev && npm run build && npm run db:push
+chmod +x scripts/build.sh && ./scripts/build.sh
 ```
 
-Cette commande :
-- Installe toutes les dépendances (y compris les devDependencies nécessaires pour le build)
-- Compile le frontend (Vite) et le backend (esbuild)
-- Applique le schéma de base de données
+Le script `scripts/build.sh` :
+1. Installe toutes les dépendances (y compris les devDependencies)
+2. Compile le frontend avec Vite (vers `dist/public/`)
+3. Compile le backend avec esbuild (vers `dist/index.js`)
+4. Crée le dossier uploads
+5. Applique le schéma de base de données
 
-**Important :** L'option `--include=dev` est nécessaire car `vite` et `esbuild` sont des devDependencies requises pour la compilation.
+**Note :** Le script utilise les chemins directs vers les binaires (`./node_modules/.bin/vite`) pour éviter les problèmes de PATH.
 
 ### Start Command
 ```bash
