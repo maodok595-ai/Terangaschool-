@@ -47,9 +47,7 @@ export default function Register() {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Inscription réussie",
-        description: user.role === "teacher" 
-          ? "Votre demande d'enseignant est en attente d'approbation."
-          : `Bienvenue ${user.firstName || ""}!`,
+        description: `Bienvenue ${user.firstName || ""}!`,
       });
       
       let targetPath = "/";
@@ -119,14 +117,6 @@ export default function Register() {
               </div>
             </RadioGroup>
             
-            {selectedRole === "teacher" && (
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="text-sm">
-                  Votre compte enseignant devra être approuvé par un administrateur avant de pouvoir créer des cours.
-                </AlertDescription>
-              </Alert>
-            )}
           </div>
 
           <Form {...form}>

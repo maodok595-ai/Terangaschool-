@@ -269,30 +269,6 @@ export default function TeacherDashboard() {
     );
   }
 
-  if (user?.teacherStatus === "pending") {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center">
-          <Card className="max-w-md mx-auto">
-            <CardContent className="py-12 text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mx-auto">
-                <AlertCircle className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
-              </div>
-              <h2 className="text-xl font-semibold">En attente de validation</h2>
-              <p className="text-muted-foreground">
-                Votre demande d'enseignant est en cours de validation. Vous serez notifié une fois approuvé.
-              </p>
-              <Badge className={TEACHER_STATUS_BADGES.pending.className}>
-                {TEACHER_STATUS_BADGES.pending.label}
-              </Badge>
-            </CardContent>
-          </Card>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   const statCards = [
     { title: "Mes cours", value: stats?.totalCourses || 0, icon: BookOpen, color: "text-teal-500", bgColor: "bg-teal-100 dark:bg-teal-900/30" },

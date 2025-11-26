@@ -184,10 +184,6 @@ export const isTeacher: RequestHandler = async (req, res, next) => {
     return res.status(403).json({ message: "Accès réservé aux enseignants" });
   }
 
-  if (user.role === "teacher" && user.teacherStatus !== "approved") {
-    return res.status(403).json({ message: "Votre compte enseignant n'est pas encore approuvé" });
-  }
-
   next();
 };
 
