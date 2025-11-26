@@ -210,6 +210,19 @@ npx drizzle-kit push
 
 12. **Scripts Cleanup:** Removed automatic session table drop from start.sh to preserve user sessions between deployments
 
+13. **Service Worker API Cache Fix:** Updated sw.js to completely bypass caching for all `/api/` routes. Previously, some API routes were being cached with cacheFirst strategy, causing stale data issues after mutations.
+
+14. **CRUD Operations Complete:** Added full CRUD functionality:
+    - PATCH routes for courses and live-courses (edit functionality)
+    - DELETE routes for courses, live-courses, and users
+    - Edit modals in TeacherDashboard with pre-filled forms
+    - Proper React Query invalidation on all mutations
+
+15. **React Query Configuration:** Updated queryClient to use:
+    - staleTime: 30 seconds (was Infinity, causing cache issues)
+    - refetchOnMount: true
+    - refetchOnWindowFocus: true
+
 ## Known Limitations
 
 ### Ephemeral File Storage on Render

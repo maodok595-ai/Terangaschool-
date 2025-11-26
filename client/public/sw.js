@@ -1,18 +1,12 @@
-const CACHE_NAME = 'terangaschool-v1';
-const STATIC_CACHE = 'terangaschool-static-v1';
-const DYNAMIC_CACHE = 'terangaschool-dynamic-v1';
+const CACHE_NAME = 'terangaschool-v2';
+const STATIC_CACHE = 'terangaschool-static-v2';
+const DYNAMIC_CACHE = 'terangaschool-dynamic-v2';
 
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png'
-];
-
-const API_CACHE_ROUTES = [
-  '/api/courses',
-  '/api/live-courses',
-  '/api/teachers'
 ];
 
 self.addEventListener('install', (event) => {
@@ -53,12 +47,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (url.pathname.startsWith('/api/auth')) {
-    return;
-  }
-
-  if (API_CACHE_ROUTES.some(route => url.pathname.startsWith(route))) {
-    event.respondWith(networkFirst(request));
+  // Never cache any API routes - always go to network
+  if (url.pathname.startsWith('/api/')) {
     return;
   }
 

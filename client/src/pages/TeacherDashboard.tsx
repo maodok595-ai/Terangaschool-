@@ -156,6 +156,7 @@ export default function TeacherDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/teacher/courses"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/teacher"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/courses"] });
       toast({ title: "Cours créé avec succès !" });
       setCreateCourseOpen(false);
       courseForm.reset();
@@ -176,6 +177,7 @@ export default function TeacherDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/teacher/live-courses"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/teacher"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/live-courses"] });
       toast({ title: "Live programmé avec succès !" });
       setCreateLiveOpen(false);
       liveForm.reset();
@@ -194,9 +196,10 @@ export default function TeacherDashboard() {
       return await apiRequest("DELETE", `/api/${type === "course" ? "courses" : "live-courses"}/${id}`);
     },
     onSuccess: (_, { type }) => {
-      queryClient.invalidateQueries({ 
-        queryKey: [type === "course" ? "/api/teacher/courses" : "/api/teacher/live-courses"] 
-      });
+      const queryKey = type === "course" ? "/api/teacher/courses" : "/api/teacher/live-courses";
+      const publicQueryKey = type === "course" ? "/api/courses" : "/api/live-courses";
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/teacher"] });
       toast({ title: "Supprimé avec succès !" });
     },
@@ -244,6 +247,56 @@ export default function TeacherDashboard() {
       });
     },
   });
+
+  const editCourseMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: { title: string; description: string; subject: string; level: string } }) => {
+      return await apiRequest("PATCH", `/api/courses/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teacher/courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/courses"] });
+      toast({ title: "Cours modifié avec succès !" });
+      setEditCourseOpen(false);
+      setSelectedCourse(null);
+    },
+    onError: (error) => {
+      toast({ 
+        title: "Erreur", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const editLiveMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: { title: string; description: string; subject: string; level: string; scheduledAt?: string; duration?: number } }) => {
+      return await apiRequest("PATCH", `/api/live-courses/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teacher/live-courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/live-courses"] });
+      toast({ title: "Live modifié avec succès !" });
+      setEditLiveOpen(false);
+      setSelectedLive(null);
+    },
+    onError: (error) => {
+      toast({ 
+        title: "Erreur", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const openEditCourse = (course: Course) => {
+    setSelectedCourse(course);
+    setEditCourseOpen(true);
+  };
+
+  const openEditLive = (live: LiveCourse) => {
+    setSelectedLive(live);
+    setEditLiveOpen(true);
+  };
 
   const onSubmitCourse = (data: z.infer<typeof createCourseSchema>) => {
     const formData = new FormData();
@@ -646,8 +699,17 @@ export default function TeacherDashboard() {
                                 <Button 
                                   variant="ghost" 
                                   size="icon"
+                                  onClick={() => openEditCourse(course)}
+                                  data-testid={`button-edit-course-${course.id}`}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon"
                                   onClick={() => deleteMutation.mutate({ type: "course", id: course.id })}
                                   disabled={deleteMutation.isPending}
+                                  data-testid={`button-delete-course-${course.id}`}
                                 >
                                   <Trash2 className="w-4 h-4 text-destructive" />
                                 </Button>
@@ -769,12 +831,23 @@ export default function TeacherDashboard() {
                                     <Eye className="w-4 h-4" />
                                   </Link>
                                 </Button>
+                                {!live.isActive && !live.isEnded && (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={() => openEditLive(live)}
+                                    data-testid={`button-edit-live-${live.id}`}
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                )}
                                 {!live.isActive && (
                                   <Button 
                                     variant="ghost" 
                                     size="icon"
                                     onClick={() => deleteMutation.mutate({ type: "live", id: live.id })}
                                     disabled={deleteMutation.isPending}
+                                    data-testid={`button-delete-live-${live.id}`}
                                   >
                                     <Trash2 className="w-4 h-4 text-destructive" />
                                   </Button>
@@ -803,6 +876,293 @@ export default function TeacherDashboard() {
       </main>
       
       <Footer />
+
+      {/* Edit Course Modal */}
+      <Dialog open={editCourseOpen} onOpenChange={setEditCourseOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Modifier le cours</DialogTitle>
+            <DialogDescription>
+              Modifiez les informations du cours.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedCourse && (
+            <EditCourseForm 
+              course={selectedCourse}
+              onSubmit={(data) => editCourseMutation.mutate({ id: selectedCourse.id, data })}
+              isPending={editCourseMutation.isPending}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Live Modal */}
+      <Dialog open={editLiveOpen} onOpenChange={setEditLiveOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Modifier le live</DialogTitle>
+            <DialogDescription>
+              Modifiez les informations de la session en direct.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedLive && (
+            <EditLiveForm 
+              live={selectedLive}
+              onSubmit={(data) => editLiveMutation.mutate({ id: selectedLive.id, data })}
+              isPending={editLiveMutation.isPending}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+// Edit Course Form Component
+function EditCourseForm({ 
+  course, 
+  onSubmit, 
+  isPending 
+}: { 
+  course: Course; 
+  onSubmit: (data: { title: string; description: string; subject: string; level: string }) => void; 
+  isPending: boolean;
+}) {
+  const form = useForm({
+    defaultValues: {
+      title: course.title,
+      description: course.description || "",
+      subject: course.subject,
+      level: course.level,
+    },
+  });
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Titre</FormLabel>
+              <FormControl>
+                <Input {...field} data-testid="input-edit-course-title" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="level"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Niveau</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger data-testid="select-edit-course-level">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {EDUCATION_LEVELS.map((lvl) => (
+                      <SelectItem key={lvl.value} value={lvl.value}>
+                        {lvl.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="subject"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Matière</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger data-testid="select-edit-course-subject">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {SUBJECTS.map((sub) => (
+                      <SelectItem key={sub.value} value={sub.value}>
+                        {sub.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea {...field} data-testid="textarea-edit-course-description" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full" disabled={isPending} data-testid="button-submit-edit-course">
+          {isPending ? "Modification..." : "Enregistrer les modifications"}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+// Edit Live Form Component
+function EditLiveForm({ 
+  live, 
+  onSubmit, 
+  isPending 
+}: { 
+  live: LiveCourse; 
+  onSubmit: (data: { title: string; description: string; subject: string; level: string; scheduledAt?: string; duration?: number }) => void; 
+  isPending: boolean;
+}) {
+  const form = useForm({
+    defaultValues: {
+      title: live.title,
+      description: live.description || "",
+      subject: live.subject,
+      level: live.level,
+      scheduledAt: live.scheduledAt ? format(new Date(live.scheduledAt), "yyyy-MM-dd'T'HH:mm") : "",
+      duration: live.duration || 60,
+    },
+  });
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Titre</FormLabel>
+              <FormControl>
+                <Input {...field} data-testid="input-edit-live-title" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="level"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Niveau</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger data-testid="select-edit-live-level">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {EDUCATION_LEVELS.map((lvl) => (
+                      <SelectItem key={lvl.value} value={lvl.value}>
+                        {lvl.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="subject"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Matière</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger data-testid="select-edit-live-subject">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {SUBJECTS.map((sub) => (
+                      <SelectItem key={sub.value} value={sub.value}>
+                        {sub.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="scheduledAt"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date et heure</FormLabel>
+                <FormControl>
+                  <Input type="datetime-local" {...field} data-testid="input-edit-live-datetime" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="duration"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Durée (min)</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    min={15} 
+                    max={180} 
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    data-testid="input-edit-live-duration"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea {...field} data-testid="textarea-edit-live-description" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full" disabled={isPending} data-testid="button-submit-edit-live">
+          {isPending ? "Modification..." : "Enregistrer les modifications"}
+        </Button>
+      </form>
+    </Form>
   );
 }
