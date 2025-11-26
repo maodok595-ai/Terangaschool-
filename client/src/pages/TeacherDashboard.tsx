@@ -138,9 +138,11 @@ export default function TeacherDashboard() {
       const response = await fetch("/api/courses", {
         method: "POST",
         body: formData,
+        credentials: "include",
       });
       if (!response.ok) {
-        throw new Error("Erreur lors de la création du cours");
+        const errorText = await response.text();
+        throw new Error(errorText || "Erreur lors de la création du cours");
       }
       return response.json();
     },
