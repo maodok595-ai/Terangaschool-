@@ -63,7 +63,10 @@ import {
   Trash2,
   FileText,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Play,
+  Square,
+  ExternalLink
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -187,6 +190,42 @@ export default function TeacherDashboard() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/teacher"] });
       toast({ title: "Supprimé avec succès !" });
+    },
+    onError: (error) => {
+      toast({ 
+        title: "Erreur", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const startLiveMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest("POST", `/api/live-courses/${id}/start`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teacher/live-courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/live-courses"] });
+      toast({ title: "Live démarré !", description: "Les participants peuvent maintenant rejoindre." });
+    },
+    onError: (error) => {
+      toast({ 
+        title: "Erreur", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const endLiveMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest("POST", `/api/live-courses/${id}/end`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teacher/live-courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/live-courses"] });
+      toast({ title: "Live terminé !", description: "La session a été clôturée." });
     },
     onError: (error) => {
       toast({ 
@@ -702,19 +741,59 @@ export default function TeacherDashboard() {
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end gap-1">
+                                {!live.isEnded && !live.isActive && (
+                                  <Button 
+                                    variant="default"
+                                    size="sm"
+                                    onClick={() => startLiveMutation.mutate(live.id)}
+                                    disabled={startLiveMutation.isPending}
+                                    className="bg-green-600 hover:bg-green-700"
+                                    data-testid={`button-start-live-${live.id}`}
+                                  >
+                                    <Play className="w-4 h-4 mr-1" />
+                                    Démarrer
+                                  </Button>
+                                )}
+                                {live.isActive && !live.isEnded && (
+                                  <>
+                                    <Button 
+                                      variant="outline"
+                                      size="sm"
+                                      asChild
+                                      data-testid={`button-join-live-${live.id}`}
+                                    >
+                                      <a href={live.jitsiUrl} target="_blank" rel="noopener noreferrer">
+                                        <ExternalLink className="w-4 h-4 mr-1" />
+                                        Rejoindre
+                                      </a>
+                                    </Button>
+                                    <Button 
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={() => endLiveMutation.mutate(live.id)}
+                                      disabled={endLiveMutation.isPending}
+                                      data-testid={`button-end-live-${live.id}`}
+                                    >
+                                      <Square className="w-4 h-4 mr-1" />
+                                      Terminer
+                                    </Button>
+                                  </>
+                                )}
                                 <Button variant="ghost" size="icon" asChild>
                                   <Link href={`/live/${live.id}`}>
                                     <Eye className="w-4 h-4" />
                                   </Link>
                                 </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon"
-                                  onClick={() => deleteMutation.mutate({ type: "live", id: live.id })}
-                                  disabled={deleteMutation.isPending}
-                                >
-                                  <Trash2 className="w-4 h-4 text-destructive" />
-                                </Button>
+                                {!live.isActive && (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={() => deleteMutation.mutate({ type: "live", id: live.id })}
+                                    disabled={deleteMutation.isPending}
+                                  >
+                                    <Trash2 className="w-4 h-4 text-destructive" />
+                                  </Button>
+                                )}
                               </div>
                             </TableCell>
                           </TableRow>
