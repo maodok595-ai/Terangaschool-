@@ -452,8 +452,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.use("/uploads", (req, res, next) => {
     res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "inline");
+    res.setHeader("X-Content-Type-Options", "nosniff");
     next();
   }, express.static(uploadsDir));
+
+  app.get("/api/download/:filename", (req, res) => {
+    const { filename } = req.params;
+    const filePath = path.join(uploadsDir, filename);
+    
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "Fichier non trouvé" });
+    }
+    
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.sendFile(filePath);
+  });
 
   const httpServer = createServer(app);
 

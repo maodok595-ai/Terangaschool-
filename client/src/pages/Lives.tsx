@@ -71,13 +71,13 @@ export default function Lives() {
                 </TabsTrigger>
               </TabsList>
 
-              <div className="flex gap-2 flex-wrap">
+              <div className="grid grid-cols-2 sm:flex gap-2">
                 <Select value={level} onValueChange={setLevel}>
-                  <SelectTrigger className="w-[140px]" data-testid="select-level">
+                  <SelectTrigger className="w-full sm:w-[140px]" data-testid="select-level">
                     <SelectValue placeholder="Niveau" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Tous les niveaux</SelectItem>
+                    <SelectItem value="all">Tous niveaux</SelectItem>
                     {EDUCATION_LEVELS.map((lvl) => (
                       <SelectItem key={lvl.value} value={lvl.value}>
                         {lvl.label}
@@ -87,11 +87,11 @@ export default function Lives() {
                 </Select>
                 
                 <Select value={subject} onValueChange={setSubject}>
-                  <SelectTrigger className="w-[160px]" data-testid="select-subject">
+                  <SelectTrigger className="w-full sm:w-[160px]" data-testid="select-subject">
                     <SelectValue placeholder="Matière" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Toutes les matières</SelectItem>
+                    <SelectItem value="all">Toutes matières</SelectItem>
                     {SUBJECTS.map((sub) => (
                       <SelectItem key={sub.value} value={sub.value}>
                         {sub.label}
@@ -102,12 +102,14 @@ export default function Lives() {
                 
                 {hasFilters && (
                   <Button 
-                    variant="ghost" 
-                    size="icon" 
+                    variant="outline" 
+                    size="sm"
                     onClick={clearFilters}
+                    className="col-span-2 sm:col-span-1"
                     data-testid="button-clear-filters"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-4 h-4 mr-1" />
+                    Effacer
                   </Button>
                 )}
               </div>

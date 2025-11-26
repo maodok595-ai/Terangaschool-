@@ -54,9 +54,9 @@ export default function Courses() {
           </div>
 
           <Card>
-            <CardContent className="p-4">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex flex-col gap-3">
+                <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     placeholder="Rechercher un cours..."
@@ -67,13 +67,13 @@ export default function Courses() {
                   />
                 </div>
                 
-                <div className="flex gap-2 flex-wrap">
+                <div className="grid grid-cols-2 sm:flex gap-2">
                   <Select value={level} onValueChange={setLevel}>
-                    <SelectTrigger className="w-[140px]" data-testid="select-level">
+                    <SelectTrigger className="w-full sm:w-[140px]" data-testid="select-level">
                       <SelectValue placeholder="Niveau" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Tous les niveaux</SelectItem>
+                      <SelectItem value="all">Tous niveaux</SelectItem>
                       {EDUCATION_LEVELS.map((lvl) => (
                         <SelectItem key={lvl.value} value={lvl.value}>
                           {lvl.label}
@@ -83,11 +83,11 @@ export default function Courses() {
                   </Select>
                   
                   <Select value={subject} onValueChange={setSubject}>
-                    <SelectTrigger className="w-[160px]" data-testid="select-subject">
+                    <SelectTrigger className="w-full sm:w-[160px]" data-testid="select-subject">
                       <SelectValue placeholder="Matière" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Toutes les matières</SelectItem>
+                      <SelectItem value="all">Toutes matières</SelectItem>
                       {SUBJECTS.map((sub) => (
                         <SelectItem key={sub.value} value={sub.value}>
                           {sub.label}
@@ -98,12 +98,14 @@ export default function Courses() {
                   
                   {hasFilters && (
                     <Button 
-                      variant="ghost" 
-                      size="icon" 
+                      variant="outline" 
+                      size="sm"
                       onClick={clearFilters}
+                      className="col-span-2 sm:col-span-1"
                       data-testid="button-clear-filters"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4 mr-1" />
+                      Effacer
                     </Button>
                   )}
                 </div>

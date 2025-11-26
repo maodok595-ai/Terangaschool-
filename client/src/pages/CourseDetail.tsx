@@ -117,8 +117,8 @@ export default function CourseDetail() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="lg:col-span-2 space-y-4 md:space-y-6 order-2 lg:order-1">
               <Card>
                 <CardHeader>
                   <CardTitle>Description</CardTitle>
@@ -138,39 +138,61 @@ export default function CourseDetail() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-muted/50 rounded-lg">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
                         <FileText className="w-6 h-6 text-red-600 dark:text-red-400" />
                       </div>
-                      <div>
-                        <p className="font-medium">{course.pdfFileName || "Cours.pdf"}</p>
+                      <div className="min-w-0">
+                        <p className="font-medium truncate">{course.pdfFileName || "Cours.pdf"}</p>
                         <p className="text-sm text-muted-foreground">Document PDF</p>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" asChild data-testid="button-view-pdf">
+                    <div className="flex gap-2 shrink-0">
+                      <Button variant="outline" size="sm" asChild data-testid="button-view-pdf">
                         <a href={course.pdfUrl} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Ouvrir
+                          <ExternalLink className="w-4 h-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Ouvrir</span>
                         </a>
                       </Button>
-                      <Button asChild data-testid="button-download-pdf">
-                        <a href={course.pdfUrl} download>
-                          <Download className="w-4 h-4 mr-2" />
-                          Télécharger
+                      <Button size="sm" asChild data-testid="button-download-pdf">
+                        <a 
+                          href={course.pdfUrl ? `/api/download/${encodeURIComponent(course.pdfUrl.split('/').pop() || '')}` : '#'}
+                          download={course.pdfFileName || "cours.pdf"}
+                        >
+                          <Download className="w-4 h-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Télécharger</span>
                         </a>
                       </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="border rounded-lg overflow-hidden bg-muted/30">
+                    <div className="p-3 bg-muted/50 border-b flex items-center justify-between">
+                      <span className="text-sm font-medium">Aperçu du document</span>
+                      <Button variant="ghost" size="sm" asChild>
+                        <a href={course.pdfUrl} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          Plein écran
+                        </a>
+                      </Button>
+                    </div>
+                    <div className="aspect-[3/4] sm:aspect-[4/3] md:aspect-video">
+                      <iframe
+                        src={course.pdfUrl}
+                        className="w-full h-full border-0"
+                        title={course.title}
+                      />
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6 order-1 lg:order-2">
               <Card>
-                <CardHeader>
-                  <CardTitle>Enseignant</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Enseignant</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-3">
@@ -204,10 +226,10 @@ export default function CourseDetail() {
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle>Informations</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Informations</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Niveau</span>
                     <span className="font-medium">{getLevelLabel(course.level)}</span>

@@ -573,17 +573,20 @@ export default function TeacherDashboard() {
                   <CardTitle>Mes cours PDF</CardTitle>
                   <CardDescription>Gérez vos cours publiés</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0 sm:p-6">
                   {coursesLoading ? (
-                    <Table>
-                      <TableBody>
-                        {Array.from({ length: 3 }).map((_, i) => (
-                          <TableRowSkeleton key={i} />
-                        ))}
-                      </TableBody>
-                    </Table>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableBody>
+                          {Array.from({ length: 3 }).map((_, i) => (
+                            <TableRowSkeleton key={i} />
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   ) : courses && courses.length > 0 ? (
-                    <Table>
+                    <div className="overflow-x-auto">
+                      <Table className="min-w-[600px]">
                       <TableHeader>
                         <TableRow>
                           <TableHead>Titre</TableHead>
@@ -600,14 +603,14 @@ export default function TeacherDashboard() {
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
                                 <FileText className="w-4 h-4 text-muted-foreground" />
-                                {course.title}
+                                <span className="truncate max-w-[150px]">{course.title}</span>
                               </div>
                             </TableCell>
                             <TableCell>{getSubjectLabel(course.subject)}</TableCell>
                             <TableCell>{getLevelLabel(course.level)}</TableCell>
                             <TableCell>{course.viewCount || 0}</TableCell>
                             <TableCell>
-                              {course.createdAt && format(new Date(course.createdAt), "dd/MM/yyyy", { locale: fr })}
+                              {course.createdAt && format(new Date(course.createdAt), "dd/MM/yy", { locale: fr })}
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end gap-1">
@@ -630,6 +633,7 @@ export default function TeacherDashboard() {
                         ))}
                       </TableBody>
                     </Table>
+                    </div>
                   ) : (
                     <EmptyState
                       icon={BookOpen}
@@ -649,27 +653,30 @@ export default function TeacherDashboard() {
                   <CardTitle>Mes lives programmés</CardTitle>
                   <CardDescription>Gérez vos sessions en direct</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0 sm:p-6">
                   {livesLoading ? (
-                    <Table>
-                      <TableBody>
-                        {Array.from({ length: 3 }).map((_, i) => (
-                          <TableRowSkeleton key={i} />
-                        ))}
-                      </TableBody>
-                    </Table>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableBody>
+                          {Array.from({ length: 3 }).map((_, i) => (
+                            <TableRowSkeleton key={i} />
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   ) : liveCourses && liveCourses.length > 0 ? (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Titre</TableHead>
-                          <TableHead>Matière</TableHead>
-                          <TableHead>Niveau</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Statut</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
+                    <div className="overflow-x-auto">
+                      <Table className="min-w-[650px]">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Titre</TableHead>
+                            <TableHead>Matière</TableHead>
+                            <TableHead>Niveau</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Statut</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
                       <TableBody>
                         {liveCourses.map((live) => (
                           <TableRow key={live.id} data-testid={`row-live-${live.id}`}>
@@ -714,6 +721,7 @@ export default function TeacherDashboard() {
                         ))}
                       </TableBody>
                     </Table>
+                    </div>
                   ) : (
                     <EmptyState
                       icon={Video}
