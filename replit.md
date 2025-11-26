@@ -198,6 +198,8 @@ npx drizzle-kit push
 
 7. **Production Path Resolution:** Updated server/index-prod.ts to use multiple fallback paths for finding the public directory
 
+8. **Teacher Validation Removed:** Teachers are now automatically approved upon registration - no admin validation required
+
 ## Render Deployment Troubleshooting
 
 ### If the app doesn't work on Render:
