@@ -3,7 +3,7 @@ import session from "express-session";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import connectPgSimple from "connect-pg-simple";
-import { Pool } from "@neondatabase/serverless";
+import { Pool } from "pg";
 
 const PgSession = connectPgSimple(session);
 
@@ -17,9 +17,18 @@ declare module "express-session" {
 export async function setupAuth(app: Express) {
   const sessionSecret = process.env.SESSION_SECRET || "edurenfort-secret-key-change-in-production";
 
-  const pool = new Pool({
+  const poolConfig: any = {
     connectionString: process.env.DATABASE_URL,
-  });
+  };
+  
+  // Add SSL configuration for production (required by Render)
+  if (process.env.NODE_ENV === 'production') {
+    poolConfig.ssl = {
+      rejectUnauthorized: false
+    };
+  }
+  
+  const pool = new Pool(poolConfig);
 
   const sessionStore = new PgSession({
     pool: pool as any,

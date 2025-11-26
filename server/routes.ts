@@ -45,6 +45,11 @@ function generateJitsiUrl(roomId: string): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint for Render
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   await setupAuth(app);
 
   await createAdminUser("maodok595@gmail.com", "Maodoka65@@");
