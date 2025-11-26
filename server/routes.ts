@@ -52,7 +52,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   await setupAuth(app);
 
-  await createAdminUser("maodok595@gmail.com", "Maodoka65@@");
+  // Create admin user with error handling
+  try {
+    await createAdminUser("maodok595@gmail.com", "Maodoka65@@");
+    console.log("Admin user check completed");
+  } catch (error) {
+    console.error("Failed to create admin user:", error);
+    console.log("The admin user will be created once the database is properly synced");
+  }
 
   app.post("/api/become-teacher", isAuthenticated, async (req: any, res) => {
     try {
