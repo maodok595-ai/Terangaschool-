@@ -53,12 +53,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="flex h-16 items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2" data-testid="link-logo">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground">
-              <GraduationCap className="w-5 h-5" />
-            </div>
-            <span className="font-bold text-xl hidden sm:inline-block">TERANGASCHOOL</span>
-          </Link>
+          <div className="w-9 h-9" />
 
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
@@ -132,14 +127,9 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" asChild className="hidden sm:inline-flex" data-testid="button-login">
-                  <Link href="/login">Connexion</Link>
-                </Button>
-                <Button asChild data-testid="button-register">
-                  <Link href="/register">S'inscrire</Link>
-                </Button>
-              </div>
+              <Button variant="ghost" asChild data-testid="button-login">
+                <Link href="/login">Connexion</Link>
+              </Button>
             )}
 
             <Button
@@ -173,9 +163,6 @@ export function Navbar() {
                 <div className="flex flex-col gap-2 mt-2">
                   <Button variant="outline" asChild>
                     <Link href="/login">Connexion</Link>
-                  </Button>
-                  <Button asChild>
-                    <Link href="/register">S'inscrire</Link>
                   </Button>
                 </div>
               )}
